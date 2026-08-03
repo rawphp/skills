@@ -1,0 +1,4 @@
+interface:
+  display_name: "Devil's Advocate Loop"
+  short_description: "Critic loop before committing to a design"
+  default_prompt: "Use $devils-advocate-loop to attack this architecture/interface/rollout plan before we commit. Log objections in .agent-reviews/redteam.md and drive high-impact weaknesses to fix-or-accept. If the do-work skill exists, route code fixes through it (start then go --auto-fix) without pausing between phases; otherwise fix code in-session with real verification."
