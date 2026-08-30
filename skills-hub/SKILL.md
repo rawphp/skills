@@ -1,11 +1,13 @@
 ---
 name: skills-hub
-description: 'Operate the agent skills hub layout (dev vs hub vs client symlinks), install or import skills, and wire agents to ~/.agents/skills. Use when the user mentions skills hub, install skill, import skill from GitHub, wire Claude/Codex/Grok skills, private tree, real dir skills, ~/.agents/skills, or skill install.sh. Differentiator: machine layout and publish path — not agent-doctor scoring, not Tailscale, not skill writing craft (see effective-agent-skills).'
+description: 'Operate the skills hub layout (EA dev → hub → client symlinks), install/import skills, and wire agents. Use for skills hub, install skill, import from GitHub, wire Claude/Codex/Grok skills, or skill install.sh. Differentiator: machine layout/publish path — not skill writing craft.'
 ---
 
 # Skills Hub
 
 Portable multi-agent skills on this machine use **one active hub**. Clients symlink their skills directories to that hub. Skill *source* lives in a separate dev tree.
+
+Always read `references/field-lessons.md` before acting.
 
 ## Layout (do not invert)
 
@@ -152,6 +154,7 @@ Installing into the hub is enough for Claude, Codex, and Grok **when their skill
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
 | Agent missing a skill | Not installed into hub | Run `install.sh` |
+| Agent lists a skill but cannot read `SKILL.md` | Source moved to archive; hub symlink left dangling | Delete dangling hub links after archive; restore only skills still required |
 | `agent-doctor`: private tree / off hub | Client is real dir | Wire client (merge + symlink) |
 | Install wrote to wrong place | Old dual-target `install.sh` | Replace with hub template |
 | Edit in EA not visible | Hub has a real copy, not symlink to dev | Re-run `install.sh` (symlink) |

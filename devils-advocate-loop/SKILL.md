@@ -1,17 +1,7 @@
 ---
 name: devils-advocate-loop
-description: >
-  Before committing to an architecture, interface, or rollout plan, run a critic
-  that argues it is wrong, then force the builder to fix-or-accept each high-impact
-  weakness with verification. Maintains a repository-local objection log at
-  .agent-reviews/redteam.md. When the do-work skill is available, code fixes route
-  through it (start then go auto-advanced); otherwise fix code in-session with
-  real verification. Use when the user says "devil's advocate", "devils advocate
-  loop", "red-team this design", "attack this architecture", "challenge this
-  API/interface", "stress-test this rollout", "critic pass before we commit", or
-  wants adversarial review of a design/plan with a durable repo log. Differentiator:
-  iterative critic↔builder loop with reopen rights, optional do-work for code, and
-  stop conditions — not a one-shot strategy red-team or launch pre-mortem.
+description: 'Run an iterative critic↔builder loop on an architecture, API, or rollout plan with a durable objection log. Use for devil''s advocate, red-team this design, attack this architecture, stress-test this rollout, or critic pass before commit. Differentiator: multi-round fix-or-accept — not one-shot strategy-red-team.'
+
 ---
 
 # Devil's Advocate Loop
