@@ -41,7 +41,7 @@ Unusable configured backend → stop. Template lives in the backend file. Never 
 
 When a light makes dw stop and wait for the user (**scope**, **human**, hard-stop, review cap at cycle 5), call `raise_light` with the light and a one-line `prompt` naming what dw needs. Pass `req` when a unit is claimed.
 
-Clear it with `raise_light` `light: null` when the user answers and dw resumes, and on every claim or resume of a unit (including a fresh `/dw-work REQ-NNN` in a new session): a light left on silences the stall alarm for the whole Issue. Then `heartbeat_req` if a unit is claimed, before the next step, or a long wait reads as a dead run.
+Clear it with `raise_light` `light: null` when the user answers and dw resumes, on every claim or resume of a unit (including a fresh `/dw-work REQ-NNN` in a new session), and after every `archive_req`: a light left on silences the stall alarm for the whole Issue and leaves an unread notification. Then `heartbeat_req` if a unit is claimed, before the next step, or a long wait reads as a dead run.
 
 The server keeps one light per Issue and a clear is Issue-wide. Before any clear, `list_reqs` for the Issue and clear only when no **other** REQ is `in_progress` or `stopped`. A waiting sibling owns the light and clears it on its own resume.
 
