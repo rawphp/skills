@@ -17,7 +17,7 @@ No ideate, verify/close reports, milestones, migrate, markdown, sqlite.
 
 ## Claim
 
-Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change and after every commit. The server treats silence as a dead run. Recover: **resume** (heartbeat, continue Make) or **unblock** (back to backlog). Never stash.
+Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change and after every commit. The server treats silence as a dead run. Recover: **resume** (clear the light, heartbeat, continue Make) or **unblock** (back to backlog). Never stash.
 
 ## Git naming
 
@@ -39,6 +39,8 @@ Unusable configured backend → stop. Template lives in the backend file. Never 
 
 ## Lights on the tracker
 
-When a light makes dw stop and wait for the user (**scope**, **human**, hard-stop, review cap at cycle 5), call `raise_light` with the light and a one-line `prompt` naming what dw needs. Pass `req` when a unit is claimed. When the user answers and dw resumes, call `raise_light` with `light: null` before the next step.
+When a light makes dw stop and wait for the user (**scope**, **human**, hard-stop, review cap at cycle 5), call `raise_light` with the light and a one-line `prompt` naming what dw needs. Pass `req` when a unit is claimed. When the user answers and dw resumes, call `raise_light` with `light: null`, then `heartbeat_req` if a unit is claimed, before the next step. A wait of more than 30 min otherwise reads as a dead run.
+
+Every claim or resume of a unit (including a fresh `/dw-work REQ-NNN` in a new session) also calls `raise_light` with `light: null` first. Clearing is a no-op when no light is on, and a light left on silences the stall alarm for the whole Issue.
 
 Best effort: no Issue yet (scope before `create_ur`), a down tracker, or a failed call → skip it and keep waiting in chat. Never block on it.
