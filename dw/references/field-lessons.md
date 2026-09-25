@@ -94,3 +94,9 @@ No pending field lessons. New lessons may be appended by the post-skill field-le
 | Symptom | Cause | Default action |
 |---|---|---|
 | The unit is archived and reported shipped, then the user sends a red CI link for the PR; the failing tests are untouched by the diff | Ship opened the PR and archived without looking at CI, and the integration branch's own latest run was already red | At Ship, check the integration branch's latest CI conclusion (`gh run list --branch <base> --limit 1`). If it's red, say so on the receipt ("CI red on base before this PR: <tests>") and tell the user before archiving; do not report the unit as clean-shipped. |
+
+## 13. The unit's files are not under version control
+
+| Symptom | Cause | Default action |
+|---|---|---|
+| Isolate has no worktree or PR to make, because the target folder is untracked or ignored (for example a `*` gitignore that force-adds only some folders) | The repo tracks only part of the tree, or the folder was never in git | Check `git check-ignore -v <path>` and `git ls-files <path>` before claiming. If it's untracked, turn on **human** with three choices: edit in place, add it to the existing repo (say whether that repo is public), or give it its own repo. With the add option, commit the untouched baseline first so the unit's diff reviews on its own. |
