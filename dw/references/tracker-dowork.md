@@ -34,6 +34,7 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 | `unblock_req` | `req_unblock` | `{ project, req }` |
 | `append_run_note` | `req_append-run-note` | `{ project, payload, req?, ur? }` |
 | `append_decision` | `decision_append` | `{ project, date, decision, rationale? }` |
+| `list_reqs` | `req_list` | `{ project, ur }` → each REQ's `slug` and `status` |
 | `raise_light` | `ur_light` | `{ project, ur, light, req?, prompt? }` — `light`: `scope` / `human` / `hard_stop` / `review_cap`; `null` clears. Notifies the owner once; same light again is a no-op |
 
 `agent_id` = `$(hostname).$$` or the session id. Same id refreshes. Heartbeat at every step change and after every commit: do-work.io notifies the owner when a claimed in-progress REQ goes 30 min without one. Errors starting `concurrent-conflict:` / `footprint-overlap:` / `not-claimable:` → stop.

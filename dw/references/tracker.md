@@ -11,7 +11,7 @@ Load at Isolate after the worktree exists. Sole work-item store is remote.
 
 ## Ops (subset)
 
-`ensure_product_container`, `create_ur`, `read_ur`, `create_req`, `set_acceptance_criteria`, `read_req`, `set_files`, `set_blocked_by`, `list_claimable_reqs`, `claim_req`, `heartbeat_req`, `set_req_status`, `archive_req`, `unblock_req`, `append_run_note`, `append_decision`, `raise_light` (do-work.io only; other backends skip it).
+`ensure_product_container`, `create_ur`, `read_ur`, `create_req`, `set_acceptance_criteria`, `read_req`, `set_files`, `set_blocked_by`, `list_claimable_reqs`, `claim_req`, `heartbeat_req`, `set_req_status`, `archive_req`, `unblock_req`, `append_run_note`, `append_decision`, `list_reqs`, `raise_light` (do-work.io only; other backends skip it).
 
 No ideate, verify/close reports, milestones, migrate, markdown, sqlite.
 
@@ -39,8 +39,10 @@ Unusable configured backend → stop. Template lives in the backend file. Never 
 
 ## Lights on the tracker
 
-When a light makes dw stop and wait for the user (**scope**, **human**, hard-stop, review cap at cycle 5), call `raise_light` with the light and a one-line `prompt` naming what dw needs. Pass `req` when a unit is claimed. When the user answers and dw resumes, call `raise_light` with `light: null`, then `heartbeat_req` if a unit is claimed, before the next step. A wait of more than 30 min otherwise reads as a dead run.
+When a light makes dw stop and wait for the user (**scope**, **human**, hard-stop, review cap at cycle 5), call `raise_light` with the light and a one-line `prompt` naming what dw needs. Pass `req` when a unit is claimed.
 
-Every claim or resume of a unit (including a fresh `/dw-work REQ-NNN` in a new session) also calls `raise_light` with `light: null` first. Clearing is a no-op when no light is on, and a light left on silences the stall alarm for the whole Issue.
+Clear it with `raise_light` `light: null` when the user answers and dw resumes, and on every claim or resume of a unit (including a fresh `/dw-work REQ-NNN` in a new session): a light left on silences the stall alarm for the whole Issue. Then `heartbeat_req` if a unit is claimed, before the next step, or a long wait reads as a dead run.
+
+The server keeps one light per Issue and a clear is Issue-wide. Before any clear, `list_reqs` for the Issue and clear only when no **other** REQ is `in_progress` or `stopped`. A waiting sibling owns the light and clears it on its own resume.
 
 Best effort: no Issue yet (scope before `create_ur`), a down tracker, or a failed call → skip it and keep waiting in chat. Never block on it.
