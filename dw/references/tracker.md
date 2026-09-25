@@ -11,13 +11,13 @@ Load at Isolate after the worktree exists. Sole work-item store is remote.
 
 ## Ops (subset)
 
-`ensure_product_container`, `create_ur`, `read_ur`, `create_req`, `set_acceptance_criteria`, `read_req`, `set_files`, `set_blocked_by`, `list_claimable_reqs`, `claim_req`, `heartbeat_req`, `set_req_status`, `archive_req`, `unblock_req`, `append_run_note`, `append_decision`.
+`ensure_product_container`, `create_ur`, `read_ur`, `create_req`, `set_acceptance_criteria`, `read_req`, `set_files`, `set_blocked_by`, `list_claimable_reqs`, `claim_req`, `heartbeat_req`, `set_req_status`, `archive_req`, `unblock_req`, `append_run_note`, `append_decision`, `raise_light` (do-work.io only; other backends skip it).
 
 No ideate, verify/close reports, milestones, migrate, markdown, sqlite.
 
 ## Claim
 
-Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. Recover: **resume** (heartbeat, continue Make) or **unblock** (back to backlog). Never stash.
+Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change and after every commit. The server treats silence as a dead run. Recover: **resume** (heartbeat, continue Make) or **unblock** (back to backlog). Never stash.
 
 ## Git naming
 
@@ -36,3 +36,9 @@ Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable
 ## Hard-stop
 
 Unusable configured backend → stop. Template lives in the backend file. Never write `REQ-*.md` as a substitute.
+
+## Lights on the tracker
+
+When a light makes dw stop and wait for the user (**scope**, **human**, hard-stop, review cap at cycle 5), call `raise_light` with the light and a one-line `prompt` naming what dw needs. Pass `req` when a unit is claimed. When the user answers and dw resumes, call `raise_light` with `light: null` before the next step.
+
+Best effort: no Issue yet (scope before `create_ur`), a down tracker, or a failed call → skip it and keep waiting in chat. Never block on it.

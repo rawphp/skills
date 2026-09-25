@@ -34,8 +34,9 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 | `unblock_req` | `req_unblock` | `{ project, req }` |
 | `append_run_note` | `req_append-run-note` | `{ project, payload, req?, ur? }` |
 | `append_decision` | `decision_append` | `{ project, date, decision, rationale? }` |
+| `raise_light` | `ur_light` | `{ project, ur, light, req?, prompt? }` — `light`: `scope` / `human` / `hard_stop` / `review_cap`; `null` clears. Notifies the owner once; same light again is a no-op |
 
-`agent_id` = `$(hostname).$$` or the session id. Same id refreshes. Errors starting `concurrent-conflict:` / `footprint-overlap:` / `not-claimable:` → stop.
+`agent_id` = `$(hostname).$$` or the session id. Same id refreshes. Heartbeat at every step change and after every commit: do-work.io notifies the owner when a claimed in-progress REQ goes 30 min without one. Errors starting `concurrent-conflict:` / `footprint-overlap:` / `not-claimable:` → stop.
 
 Archive gate needs at least one checked acceptance criterion plus `criteria_approved`. Tick the criteria brief wrote (`is_checked: true`, re-sending the full list). If an older REQ has none, `req_set-acceptance-criteria` with items `{ "body": "…", "is_checked": true }` from `done:` (any other shape fails and leaves the list empty), then set `criteria_approved: true` via `req update`.
 

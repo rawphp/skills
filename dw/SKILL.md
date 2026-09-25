@@ -60,6 +60,8 @@ Forced S: formatter, lockfile, typo, generated-only.
 | **human** | Dirty tree, irreversible, two product options |
 | **interrupt** | User says stop / enough / ship after a review report |
 
+A light that stops dw to wait (**scope**, **human**, hard-stop, review cap) also goes to the tracker as `raise_light`, cleared on resume (`references/tracker.md` § Lights on the tracker). Heartbeat the claim at every step change and commit.
+
 ## Hard rules
 
 - Never stash. Dirty primary checkout → **human**.
