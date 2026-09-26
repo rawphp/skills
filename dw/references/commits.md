@@ -31,14 +31,14 @@ git add -- <named files from this slice only>
 git commit -m "$(cat <<'EOF'
 <type>(<id>): <short>
 
-<REQ: or Issue:> <id>
-UR: <UR-NNN if any>
+REQ: <REQ-NNN>
+Issue: <KEY>-NNN
 Output: <primary path>
 EOF
 )"
 ```
 
-`<id>` from `references/tracker.md` git naming. Do not commit `.dw/` artifacts, review packets, or paths outside the unit `files:` (plus tests those files require).
+`<id>` and footer from `references/tracker.md` git naming (Linear: one `Issue: <ENG-123>` line). Do not commit `.dw/` artifacts, review packets, or paths outside the unit `files:` (plus tests those files require).
 
 ## Do not
 

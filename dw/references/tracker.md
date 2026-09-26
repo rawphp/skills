@@ -11,7 +11,7 @@ Load at Isolate after the worktree exists. Sole work-item store is remote.
 
 ## Ops (subset)
 
-`ensure_product_container`, `create_ur`, `read_ur`, `create_req`, `set_acceptance_criteria`, `read_req`, `set_files`, `set_blocked_by`, `list_claimable_reqs`, `claim_req`, `heartbeat_req`, `set_req_status`, `archive_req`, `unblock_req`, `append_run_note`, `append_decision`, `list_reqs`, `raise_light` (do-work.io only; other backends skip it).
+`ensure_product_container`, `create_issue`, `read_issue`, `create_req`, `set_acceptance_criteria`, `read_req`, `set_files`, `set_blocked_by`, `list_claimable_reqs`, `claim_req`, `heartbeat_req`, `set_req_status`, `archive_req`, `unblock_req`, `append_run_note`, `append_decision`, `list_reqs`, `raise_light` (do-work.io only; other backends skip it).
 
 No ideate, verify/close reports, milestones, migrate, markdown, sqlite.
 
@@ -23,13 +23,13 @@ Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable
 
 | Backend | Branch | Commit |
 |---------|--------|--------|
-| do-work.io | `req/REQ-NNN` | `feat(REQ-NNN):` / `fix(REQ-NNN):` + `REQ:` / `UR:` footer |
-| Linear | `req/<sanitized-linear-id>` | `feat(ENG-123):` / `fix(ENG-123):` + `Issue:` / `UR:` footer |
+| do-work.io | `req/REQ-NNN` | `feat(REQ-NNN):` / `fix(REQ-NNN):` + `REQ:` / `Issue:` footer |
+| Linear | `req/<sanitized-linear-id>` | `feat(ENG-123):` / `fix(ENG-123):` + `Issue:` footer |
 
 ## Dark vs create
 
-- `/dw-brief` always creates the workset (`create_ur` + `create_req`). See `brief.md`.
-- `/dw-work` never creates. Named slug → `claim_req` if claimable. Else first claimable REQ, else hard-stop.
+- `/dw-brief` always creates the workset (`create_issue` + `create_req`). See `brief.md`.
+- `/dw-work` never creates. Named REQ (`REQ-NNN`, Linear `ENG-123`) → `claim_req` if claimable. Named Issue (`<KEY>-NNN`) → its first claimable REQ. Nothing named → first claimable REQ, else hard-stop.
 - L **scope** lives in brief: wait for go, then create.
 - S on `/dw-work` with no unit: still need a workset from brief, or skip tracker only when already on a claimed unit.
 
@@ -45,4 +45,4 @@ Clear it with `raise_light` `light: null` when the user answers and dw resumes, 
 
 The server keeps one light per Issue and a clear is Issue-wide. Before any clear, `list_reqs` for the Issue and clear only when no **other** REQ is `in_progress` or `stopped`. A waiting sibling owns the light and clears it on its own resume.
 
-Best effort: no Issue yet (scope before `create_ur`), a down tracker, or a failed call → skip it and keep waiting in chat. Never block on it.
+Best effort: no Issue yet (scope before `create_issue`), a down tracker, or a failed call → skip it and keep waiting in chat. Never block on it.

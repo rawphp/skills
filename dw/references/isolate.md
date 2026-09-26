@@ -19,6 +19,6 @@ After Ship reports a PR URL: `git worktree remove <path>` (or host cleanup). Kee
 
 ## Tracker before pick
 
-Named PR (user gave a PR URL to continue): the PR is the unit. Work on its branch; do not claim an unrelated REQ, do not create a UR/REQ; receipt tracker = none.
+Named PR (user gave a PR URL to continue): the PR is the unit. Work on its branch; do not claim an unrelated REQ, do not create an Issue/REQ; receipt tracker = none.
 
 Otherwise load `references/tracker.md` and the active backend file. `ensure_product_container`. Then pick/claim (or create for M dark / L after scope).

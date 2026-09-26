@@ -8,7 +8,7 @@ Need `tracker.dowork.base_url` and `tracker.dowork.project`. Empty project slug 
 
 **Wire:** search underscore name first (`req_claim`), then dotted (`req.claim`). Use the observed qualified name. Always pass `project: {tracker.dowork.project}` except `project_ensure` (uses `slug`).
 
-Product noun: **Issue**. Agent id: `UR-NNN` (param `ur`). Units: `REQ-NNN` (param `req`). Never invent `issue.create`.
+Product noun: **Issue**. Agent id: `<KEY>-NNN` with a per-project key, e.g. `DW-104` (param `issue`). Units: `REQ-NNN` (param `req`).
 
 ## Rediscover
 
@@ -19,9 +19,9 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 | Op | Wire | Args |
 |----|------|------|
 | `ensure_product_container` | `project_ensure` | `{ slug, name? }` |
-| `create_ur` | `ur_create` | `{ project, title, brief }` → `data.slug` |
-| `read_ur` | `ur_get` | `{ project, ur }` |
-| `create_req` | `req_create` | `{ project, ur, title, files? }` → `data.slug` |
+| `create_issue` | `issue_create` | `{ project, title, brief }` → `data.slug` |
+| `read_issue` | `issue_get` | `{ project, issue }` |
+| `create_req` | `req_create` | `{ project, issue, title, files? }` → `data.slug` |
 | `set_acceptance_criteria` | `req_set-acceptance-criteria` | `{ project, req, items: [{ body, is_checked: false }] }` — at create; tick at archive |
 | `read_req` | `req_get` | `{ project, req }` includes `active_claim` |
 | `set_files` | `req_set-files` | `{ project, req, files }` |
@@ -32,10 +32,10 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 | `set_req_status` | `req_set-status` | `{ project, req, status }` backlog/in_progress/stopped/done |
 | `archive_req` | `req_archive` | set `closure_proof` + `done` + checked AC first; `{ project, req }` |
 | `unblock_req` | `req_unblock` | `{ project, req }` |
-| `append_run_note` | `req_append-run-note` | `{ project, payload, req?, ur? }` |
+| `append_run_note` | `req_append-run-note` | `{ project, payload, req?, issue? }` |
 | `append_decision` | `decision_append` | `{ project, date, decision, rationale? }` |
-| `list_reqs` | `req_list` | `{ project, ur }` → each REQ's `slug` and `status` |
-| `raise_light` | `ur_light` | `{ project, ur, light, req?, prompt? }` — `light`: `scope` / `human` / `hard_stop` / `review_cap`; `null` clears. Notifies the owner once; same light again is a no-op |
+| `list_reqs` | `req_list` | `{ project, issue }` → each REQ's `slug` and `status` |
+| `raise_light` | `issue_light` | `{ project, issue, light, req?, prompt? }` — `light`: `scope` / `human` / `hard_stop` / `review_cap`; `null` clears. Notifies the owner once; same light again is a no-op |
 
 `agent_id` = `$(hostname).$$` or the session id. Same id refreshes. Heartbeat at every step change and after every commit: do-work.io notifies the owner when a claimed in-progress REQ goes 30 min without one. Errors starting `concurrent-conflict:` / `footprint-overlap:` / `not-claimable:` → stop.
 
