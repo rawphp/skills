@@ -11,7 +11,7 @@ Write to a tempfile and pass `--body-file`. This is the change receipt.
 
 ## Tracker
 - backend: do-work-io | linear
-- UR: …
+- Issue: …
 - REQ: …   # or Linear issue id
 
 ## Models

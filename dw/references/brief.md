@@ -12,7 +12,7 @@ A **workset** is one Issue (brief) plus one or more REQs (units) on the configur
 4. Contract (`contract.md`).
    - **scope** (WHAT/HOW is a real choice): write `{repo}/.dw/contract.md`, **stop until go**.
    - Else: five lines in chat (M) or one sentence (S), then create immediately.
-5. `create_ur` with the verbatim brief as `brief` / title from the first line.
+5. `create_issue` with the verbatim brief as `brief` / title from the first line.
 6. Units:
    - Default: one `create_req` titled from `done:`, `files` from the contract.
    - Every REQ gets acceptance criteria at creation (`set_acceptance_criteria`, unchecked): one observable item per part of `done:`, plus what `out:` keeps unchanged and a tests-green item. Never leave a REQ with none.
@@ -21,15 +21,15 @@ A **workset** is one Issue (brief) plus one or more REQs (units) on the configur
 
 ```text
 Workset
-UR: …
+Issue: …
 REQ: …   (or Linear issue ids)
 ACs: <count> per REQ
 files: …
-Next: /dw-work <REQ or UR>
+Next: /dw-work <REQ or Issue>
 ```
 
 Do not claim, do not worktree, do not edit product files, do not open a PR.
 
 ## Resume later
 
-`/dw-work UR-NNN` or `/dw-work REQ-NNN` (Linear: `ENG-123`).
+`/dw-work <KEY>-NNN` (Issue) or `/dw-work REQ-NNN` (Linear: `ENG-123`).

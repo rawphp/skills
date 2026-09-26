@@ -4,7 +4,7 @@ Load only when `tracker.backend` is `linear`.
 
 Need a resolvable team (`tracker.linear.team_id` and/or `team_key`) and `product_project` (name or UUID; else `project.name`; else git-root basename). Every `status_map` name must exist on the team. Missing any of these → hard-stop.
 
-**Hierarchy:** Issue (brief) = Project Milestone (`<!-- do-work-ur -->`). Unit = Linear issue id (`ENG-123`, `<!-- do-work-req -->`). Shared product Project, not one Project per Issue. Never steal a human assignee.
+**Hierarchy:** Issue (brief) = Project Milestone (`<!-- do-work-ur -->`, a stored marker: keep the name). Unit = Linear issue id (`ENG-123`, `<!-- do-work-req -->`). Shared product Project, not one Project per Issue. Never steal a human assignee.
 
 ## Rediscover
 
@@ -28,7 +28,7 @@ Evidence + Check clean → mapped `done` + `archive_req` sequence for this backe
 
 ## Git
 
-Branch `req/<sanitized-linear-id>`. Commit `feat(ENG-123):` with `Issue:` / `UR:` footer.
+Branch `req/<sanitized-linear-id>`. Commit `feat(ENG-123):` with `Issue:` footer.
 
 ## Hard-stop
 

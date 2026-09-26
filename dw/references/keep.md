@@ -10,13 +10,13 @@ bash <skill-root>/scripts/log-episode.sh query "{repo}/.dw/log.jsonl" "<task tex
 
 Inject the top 3 hits into working memory. If `{repo}/.dw/learnings.md` exists, load matching bullets. No log → continue.
 
-If the user named `UR-NNN` / `REQ-NNN` / `ENG-123`, `read_ur` / `read_req` that item (`references/tracker.md`).
+If the user named a unit (`REQ-NNN`, Linear `ENG-123`), `read_req` it. Any other do-work.io `<KEY>-NNN` is an Issue: `read_issue` it (`references/tracker.md`).
 
 ## Append (step 6)
 
 ```bash
 bash <skill-root>/scripts/log-episode.sh append "{repo}/.dw/log.jsonl" <<'EOF'
-{"task":"","weight":"S|M|L","approach":"","outcome":"success|fail|partial|blocked","errors":"","resolution":"","sha":"","files":[],"lights":[],"review_cycles":0,"ur":"","req":""}
+{"task":"","weight":"S|M|L","approach":"","outcome":"success|fail|partial|blocked","errors":"","resolution":"","sha":"","files":[],"lights":[],"review_cycles":0,"issue":"","req":""}
 EOF
 ```
 
