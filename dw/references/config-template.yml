@@ -1,0 +1,22 @@
+# {repo}/.dw/config.yml
+tracker:
+  backend: do-work-io # or linear
+  dowork:
+    base_url: https://example
+    token_env: DOWORK_IO_PAT
+    project: your-slug
+    mcp_profile: dowork.control
+  linear:
+    team_id: ""
+    product_project: ""
+    status_map:
+      backlog: Todo
+      in_progress: In Progress
+      stopped: Canceled
+      done: Done
+models:
+  default: grok
+  available:
+    grok:
+      id: grok-4.6
+      via: host
