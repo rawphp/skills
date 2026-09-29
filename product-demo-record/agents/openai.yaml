@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Demo Record"
+  short_description: "Record live app demo walkthroughs"
+  default_prompt: "Use $product-demo-record to seed a demo account, dry-run the owner walk, then screen-record it on one Playwright page."
