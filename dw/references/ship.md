@@ -1,6 +1,6 @@
 # Ship
 
-Load at step 5 after Check is clean (or user interrupt **ship** with no unnamed blockers).
+Load at step 5 after Check is clean (or user interrupt **ship** with no unnamed blockers). Heartbeat `step: Ship`.
 
 ## Commit
 
@@ -29,4 +29,6 @@ After the PR URL: remove the worktree. Keep the branch. Return to the primary ch
 
 ## Archive
 
-Then `archive_req` (backend file). Do not archive if Check stopped with open blockers and the user did not ship.
+`read_req`. `check_ac` any AC still unticked that the diff proves, with evidence (`references/tracker.md` § Acceptance criteria). If `check_ac` fails, use the backend file's fallback.
+
+Then `archive_req` (backend file), then stop the heartbeat loop. Do not archive if Check stopped with open blockers and the user did not ship.
