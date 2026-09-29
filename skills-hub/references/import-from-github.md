@@ -3,21 +3,22 @@
 ## Sparse clone (preferred for monorepos)
 
 ```bash
+SKILLS_SRC=~/src/skills                     # your clone of the skills repo
 REPO_URL="https://github.com/org/repo.git"
 SUBPATH="skills/agent-orchestration/cmux"   # path inside the repo
-NAME="cmux"                                 # folder name under ~/EA/skills
+NAME="cmux"                                 # folder name under $SKILLS_SRC
 
 TMP=$(mktemp -d)
 git clone --depth 1 --filter=blob:none --sparse "$REPO_URL" "$TMP/repo"
 git -C "$TMP/repo" sparse-checkout set "$SUBPATH"
 
-DEST="$HOME/EA/skills/$NAME"
+DEST="$SKILLS_SRC/$NAME"
 mkdir -p "$DEST"
 cp -R "$TMP/repo/$SUBPATH/." "$DEST/"
 
 # Hub-aware installer if upstream does not provide one
 if [ ! -f "$DEST/install.sh" ] || ! grep -q 'AGENTS_SKILLS_HUB\|.agents/skills' "$DEST/install.sh"; then
-  cp "$HOME/EA/skills/skills-hub/references/install-template.sh" "$DEST/install.sh"
+  cp "$SKILLS_SRC/skills-hub/references/install-template.sh" "$DEST/install.sh"
   chmod +x "$DEST/install.sh"
 fi
 
@@ -31,13 +32,12 @@ rm -rf "$TMP"
 ## Full clone (small single-skill repos)
 
 ```bash
-git clone --depth 1 "$REPO_URL" "$HOME/EA/skills/$NAME"
+git clone --depth 1 "$REPO_URL" "$SKILLS_SRC/$NAME"
 # strip .git if you do not want nested repos:
-# rm -rf "$HOME/EA/skills/$NAME/.git"
-cp "$HOME/EA/skills/skills-hub/references/install-template.sh" \
-   "$HOME/EA/skills/$NAME/install.sh"
-chmod +x "$HOME/EA/skills/$NAME/install.sh"
-"$HOME/EA/skills/$NAME/install.sh"
+# rm -rf "$SKILLS_SRC/$NAME/.git"
+cp "$SKILLS_SRC/skills-hub/references/install-template.sh" "$SKILLS_SRC/$NAME/install.sh"
+chmod +x "$SKILLS_SRC/$NAME/install.sh"
+"$SKILLS_SRC/$NAME/install.sh"
 ```
 
 ## After import
@@ -47,4 +47,4 @@ ls -la ~/.agents/skills/$NAME
 test "$(realpath ~/.claude/skills)" = "$(realpath ~/.agents/skills)"
 ```
 
-Do not leave the only copy under a client private tree. Dev = `~/EA/skills`; active = hub symlink.
+Do not leave the only copy under a client's own skills directory. Source = `$SKILLS_SRC`; active = hub symlink.

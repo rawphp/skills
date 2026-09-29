@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-# Install this skill into the active skills hub (~/.agents/skills).
-# Agents wired to the hub (e.g. ~/.claude/skills → hub) pick it up automatically.
-#
-# Copy into a skill dev dir as install.sh:
-#   cp references/install-template.sh ~/EA/skills/<name>/install.sh
-#   chmod +x ~/EA/skills/<name>/install.sh
+# Symlink this skill into a skills directory (default ~/.agents/skills).
+# Claude Code only: AGENTS_SKILLS_HUB=~/.claude/skills ./install.sh
 set -euo pipefail
 SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_NAME="$(basename "$SOURCE_DIR")"
