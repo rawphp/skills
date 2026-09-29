@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Frame compositor. render.mjs calls setup(timeline) once, then renderAt(t) per frame. Everything is a pure function of t.
+     A project's cards.js is injected before setup and can call addCard(name, {css, build, draw}). -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=block" rel="stylesheet">
+<style>
+  :root { --primary:#312e81; --accent:#38bdf8; --accent2:#a78bfa; --highlight:#fbbf24; --ink:#111827; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0f1d33; font-family: Inter, system-ui, sans-serif; }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+  canvas { position: absolute; inset: 0; }
+  .layer { position: absolute; inset: 0; pointer-events: none; }
+  .hidden { display: none !important; }
+  #cursor { position: absolute; left: 0; top: 0; width: 34px; height: 34px; transform-origin: 0 0; filter: drop-shadow(0 3px 5px rgba(0,0,0,.35)); }
+  .ripple { position: absolute; border-radius: 50%; border: 4px solid var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  .ring { position: absolute; border: 5px solid var(--highlight); border-radius: 14px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--highlight) 25%, transparent), 0 0 26px color-mix(in srgb, var(--highlight) 55%, transparent); }
+  .sticker { position: absolute; font-family: Caveat, cursive; font-weight: 700; color: var(--ink); background: #FFE58F; padding: 14px 26px 16px; border-radius: 6px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 -3px 0 rgba(0,0,0,.06); white-space: pre; line-height: 1.02; text-align: center; transform-origin: 50% 50%; }
+  .sticker.emoji { background: none; box-shadow: none; padding: 0; font-family: 'Apple Color Emoji', sans-serif; }
+  #cap { position: absolute; left: 50%; bottom: 44px; transform: translateX(-50%); max-width: 1500px; padding: 12px 28px 14px; border-radius: 14px;
+    background: rgba(18,32,56,.86); color: #fff; font-size: 38px; font-weight: 600; letter-spacing: -.2px; text-align: center; line-height: 1.25; white-space: nowrap; }
+  .card { position: absolute; inset: 0; }
+  /* grid: a file window that fills up with items */
+  .t-grid { background: radial-gradient(1200px 700px at 30% 20%, #f3f8fc, #d9e6f1); }
+  .t-grid .win { position: absolute; left: 260px; top: 150px; width: 1400px; height: 760px; background: #fff; border-radius: 18px; box-shadow: 0 30px 80px rgba(20,40,70,.25); overflow: hidden; }
+  .t-grid .bar { height: 64px; background: #eef2f6; border-bottom: 1px solid #dde3ea; display: flex; align-items: center; padding: 0 24px; gap: 10px; font-size: 22px; color: #51627a; font-weight: 600; }
+  .t-grid .dot { width: 16px; height: 16px; border-radius: 50%; }
+  .t-grid .grid { position: absolute; top: 110px; left: 70px; right: 70px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px 40px; }
+  .file { display: flex; flex-direction: column; align-items: center; gap: 16px; transform-origin: 50% 80%; }
+  .file .ico { width: 104px; height: 128px; border-radius: 10px; position: relative; display: grid; place-items: end center; padding-bottom: 20px; color: #fff; font-weight: 800; font-size: 30px; letter-spacing: 1px; }
+  .file .ico.emoji { background: none !important; box-shadow: none !important; font-size: 96px; place-items: center; padding: 0; }
+  .file .name { font-size: 23px; font-weight: 600; color: #26374f; text-align: center; max-width: 290px; line-height: 1.2; }
+  .t-grid .punch { left: 50%; top: 470px; font-size: 84px; }
+  /* title and end: brand background */
+  .t-title, .t-end { background: var(--primary); color: #fff; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; }
+  .title-wrap { position: absolute; left: 0; right: 0; top: 330px; text-align: center; }
+  .t-end .title-wrap { top: 250px; }
+  .eyebrow { font-size: 26px; letter-spacing: 8px; font-weight: 700; color: var(--accent); }
+  .big { font-size: 150px; font-weight: 800; letter-spacing: -4px; margin-top: 14px; }
+  .t-end .big { font-size: 128px; }
+  .pill { display: inline-block; margin-top: 34px; padding: 14px 34px; border-radius: 999px; background: var(--highlight); color: var(--ink); font-size: 40px; font-weight: 800; }
+  .aside { margin-top: 26px; font-size: 32px; font-style: italic; color: #cfe2f5; }
+  .sub { margin-top: 18px; font-size: 38px; font-weight: 600; color: var(--accent); }
+  .line { margin-top: 40px; font-size: 38px; font-weight: 600; color: #e7f1fb; }
+  .line b { color: var(--highlight); }
+  .note { margin-top: 22px; font-size: 28px; color: #a9c3de; font-style: italic; }
+  .credits { position: absolute; left: 0; right: 0; bottom: 64px; text-align: center; font-size: 22px; color: #9fb7d2; line-height: 1.6; }
+  /* stack: cards sliding in under a heading */
+  .t-stack { background: linear-gradient(160deg, #f5f9fc, #e3edf6); }
+  .t-stack .head { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-size: 60px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+  .item { position: absolute; left: 380px; width: 1160px; background: #fff; border-radius: 22px; padding: 34px 44px; box-shadow: 0 24px 60px rgba(20,40,70,.18); display: flex; gap: 34px; align-items: center; }
+  .item .env { width: 110px; height: 110px; border-radius: 22px; display: grid; place-items: center; flex: none; font-size: 60px; }
+  .item .from { font-size: 24px; color: #5b6b82; font-weight: 600; }
+  .item .title { font-size: 42px; font-weight: 800; color: var(--ink); margin-top: 4px; letter-spacing: -.5px; }
+  .item .subl { font-size: 26px; color: color-mix(in srgb, var(--accent) 60%, #000); font-weight: 600; margin-top: 8px; }
+  #fade { position: absolute; inset: 0; background: #000; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="foot" width="1920" height="1080"></canvas>
+  <canvas id="prev" width="1920" height="1080"></canvas>
+  <div id="cards-under"></div>
+  <div class="layer" id="rings"></div>
+  <div class="layer" id="ripples"></div>
+  <svg id="cursor" viewBox="0 0 34 34" class="hidden"><path d="M4 2 L4 27 L10.5 21 L15 31 L19.5 29 L15.2 19.4 L24 19.4 Z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/></svg>
+  <div id="cards-over"></div>
+  <div class="layer" id="stickers"></div>
+  <div id="cap" class="hidden"></div>
+  <div id="fade" style="opacity:0"></div>
+</div>
+<script>
+const W = 1920, H = 1080, SRC = 2; // footage frames are 2x
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+const easeOut = (p) => 1 - Math.pow(1 - p, 3);
+const back = (p) => { const c = 1.9; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, t0, d) => clamp((t - t0) / d, 0, 1);
+const isEmoji = (s) => /^\p{Extended_Pictographic}/u.test(s || '');
+const ICON = { xls: ['XLS', 'linear-gradient(#21a366,#107c41)'], doc: ['DOC', 'linear-gradient(#2b7cd3,#185abd)'], pdf: ['PDF', 'linear-gradient(#e5484d,#b42318)'], ppt: ['PPT', 'linear-gradient(#e0763c,#c43e1c)'] };
+const MAIL = '<svg width="62" height="62" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>';
+let TL, fctx, pctx; const cache = new Map(); const cardEl = {};
+
+// ---- card templates: build(card) returns HTML; draw(el, card, lt, scene) animates it ----
+const T = {
+  grid: {
+    build: (c) => `<div class="win"><div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span style="margin-left:18px">${esc(c.window)}</span></div>
+      <div class="grid">${c.items.map((it) => { const ic = it.icon || c.icon || 'xls'; const [lbl, bg] = ICON[ic] || [ic, 'none'];
+        return `<div class="file"><div class="ico${isEmoji(ic) ? ' emoji' : ''}" style="background:${bg};box-shadow:0 8px 18px rgba(0,0,0,.2)">${esc(lbl)}</div><div class="name">${esc(it.text)}</div></div>`; }).join('')}</div></div>
+      ${c.punch ? `<div class="sticker punch">${esc(c.punch)}</div>` : ''}`,
+    draw(el, c, lt) {
+      const wob0 = c.wobble?.t ?? 1e9;
+      [...el.querySelectorAll('.file')].forEach((f, i) => {
+        const a = prog(lt, c.items[i].t, 0.4);
+        const wob = lt > wob0 ? Math.sin((lt - wob0) * 9 + i * 1.7) * 4 * Math.min(1, (lt - wob0) * 2) : 0;
+        f.style.opacity = a > 0 ? 1 : 0; f.style.transform = `scale(${a > 0 ? 0.3 + 0.7 * back(a) : 0}) rotate(${wob}deg)`;
+      });
+      const sc = c.scratchT ?? 1e9; const win = el.querySelector('.win');
+      const shake = lt > sc && lt < sc + 0.35 ? Math.sin((lt - sc) * 90) * 10 * (1 - (lt - sc) / 0.35) : 0;
+      win.style.transform = `translateX(${shake}px)`;
+      win.style.filter = lt > sc ? `grayscale(${prog(lt, sc, 0.2)}) blur(${2 * prog(lt, sc, 0.2)}px)` : '';
+      const p = el.querySelector('.punch');
+      if (p) { const a = prog(lt, (c.punchT ?? sc) + 0.05, 0.3); p.style.opacity = a; p.style.transform = `translate(-50%,-50%) rotate(-4deg) scale(${0.4 + 0.6 * back(a)})`; }
+    },
+  },
+  title: {
+    build: (c) => `<div class="blob b1" style="width:700px;height:700px;background:var(--accent)"></div><div class="blob b2" style="width:600px;height:600px;background:var(--accent2)"></div>
+      <div class="title-wrap"><div class="eyebrow">${esc(c.eyebrow)}</div><div class="big">${esc(c.title)}</div>
+      ${c.pill ? `<div><span class="pill">${esc(c.pill.text)}</span></div>` : ''}${c.aside ? `<div class="aside">${esc(c.aside.text)}</div>` : ''}${c.sub ? `<div class="sub">${esc(c.sub.text)}</div>` : ''}</div>`,
+    draw(el, c, lt) {
+      blobs(el, lt);
+      const up = (sel, t0, d = 0.6) => { const e = el.querySelector(sel); if (!e) return; const p = easeOut(prog(lt, t0, d)); e.style.opacity = p; e.style.transform = `translateY(${(1 - p) * 40}px)`; };
+      up('.eyebrow', 0.1); up('.big', 0.25, 0.7);
+      const pill = el.querySelector('.pill');
+      if (pill) { const pp = prog(lt, c.pill.t - 0.05, 0.4); pill.style.opacity = pp > 0 ? 1 : 0; pill.style.transform = `scale(${pp > 0 ? 0.4 + 0.6 * back(pp) : 0}) rotate(-2deg)`; }
+      if (c.aside) up('.aside', c.aside.t); if (c.sub) up('.sub', c.sub.t);
+    },
+  },
+  stack: {
+    build: (c) => `<div class="head">${esc(c.heading)}</div>${c.items.map((it, i) => { const tone = it.tone === 'highlight' ? 'var(--highlight)' : 'var(--accent)';
+      return `<div class="item" style="top:${330 + i * 230}px"><div class="env" style="background:color-mix(in srgb, ${tone} 20%, transparent);color:color-mix(in srgb, ${tone} 70%, #000)">${isEmoji(it.icon) ? it.icon : MAIL}</div>
+      <div>${it.from ? `<div class="from">${esc(it.from)}</div>` : ''}<div class="title">${esc(it.title)}</div>${it.sub ? `<div class="subl">${esc(it.sub)}</div>` : ''}</div></div>`; }).join('')}`,
+    draw(el, c, lt) {
+      el.querySelector('.head').style.opacity = easeOut(prog(lt, 0, 0.5));
+      [...el.querySelectorAll('.item')].forEach((e, i) => {
+        const p = prog(lt, c.items[i].t - 0.1, 0.5); e.style.opacity = p > 0 ? 1 : 0;
+        e.style.transform = `translateX(${(1 - easeOut(p)) * 220}px) scale(${0.9 + 0.1 * easeOut(p)})`;
+      });
+    },
+  },
+  end: {
+    build: (c) => `<div class="blob b1" style="width:700px;height:700px;background:var(--accent)"></div><div class="blob b2" style="width:600px;height:600px;background:var(--accent2)"></div>
+      <div class="title-wrap"><div class="eyebrow">${esc(c.eyebrow)}</div><div class="big">${esc(c.title)}</div>
+      ${(c.lines || []).map((l) => `<div class="line">${l}</div>`).join('')}${c.note ? `<div class="note">${esc(c.note)}</div>` : ''}</div>
+      <div class="credits">${(TL.credits || []).map(esc).join('<br>')}</div>`,
+    draw(el, c, lt) { blobs(el, lt); el.style.opacity = easeOut(prog(lt, 0, 0.6)); },
+  },
+};
+function blobs(el, lt) {
+  el.querySelector('.b1').style.transform = `translate(${-120 + Math.sin(lt * 0.5) * 60}px, ${-160 + Math.cos(lt * 0.4) * 40}px)`;
+  el.querySelector('.b2').style.transform = `translate(${1380 + Math.cos(lt * 0.45) * 70}px, ${560 + Math.sin(lt * 0.35) * 50}px)`;
+}
+// Project cards (cards.js): addCard('quote', { css, build: (card) => html, draw: (el, card, lt, scene) => {} }).
+// Style the root as .t-<name> and give it a background; the crossfade into the next scene reads it.
+window.addCard = (name, def) => {
+  if (def.css) { const st = document.createElement('style'); st.textContent = def.css; document.head.appendChild(st); }
+  T[name] = def;
+};
+function makeCard(key, card, over) {
+  if (!T[card.template]) throw new Error(`${key}: unknown card template "${card.template}". Available: ${Object.keys(T).join(', ')}. Add your own with addCard() in cards.js`);
+  const el = document.createElement('div'); el.className = `card t-${card.template} hidden`;
+  el.innerHTML = T[card.template].build(card); $(over ? 'cards-over' : 'cards-under').appendChild(el); cardEl[key] = el;
+}
+
+window.setup = async (tl) => {
+  TL = tl;
+  for (const [k, v] of Object.entries(TL.brand || {})) document.documentElement.style.setProperty('--' + k, v);
+  fctx = $('foot').getContext('2d'); pctx = $('prev').getContext('2d');
+  fctx.imageSmoothingQuality = 'high'; pctx.imageSmoothingQuality = 'high';
+  for (const s of TL.scenes) {
+    if (s.card) makeCard(s.id, s.card, false);
+    if (s.intro) makeCard(s.id + ':intro', s.intro, true);
+    if (s.type === 'footage') s.views = camViews(s);
+  }
+  if (TL.end) { TL.end = { template: 'end', ...TL.end }; makeCard('end', TL.end, true); }
+  await document.fonts.ready;
+};
+
+async function img(src) {
+  if (cache.has(src)) return cache.get(src);
+  const im = new Image(); im.src = src; await im.decode();
+  cache.set(src, im); if (cache.size > 40) cache.delete(cache.keys().next().value);
+  return im;
+}
+function frameAt(s, lt) {
+  const f = s.frames; let lo = 0, hi = f.length - 1, best = 0;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (f[m].t <= lt) { best = m; lo = m + 1; } else hi = m - 1; }
+  return `file://${s.dir}/${f[best].file}`;
+}
+function targetView(c) {
+  if (c.full) return { x: 0, y: 0, w: W, h: H };
+  const r = c.rect; let z = Math.min(W / (r.w * c.pad), H / (r.h * c.pad), c.zoom);
+  if (z < 1.2 && c.zoom > 1.2) z = Math.min(W / (r.w * 1.03), H / (r.h * 1.03), c.zoom); // wide targets: trade padding for zoom
+  z = Math.max(1, z);
+  const w = W / z, h = H / z;
+  return { x: clamp(r.x + r.w / 2 - w / 2, 0, W - w), y: clamp(r.y + r.h / 2 - h / 2, 0, H - h), w, h };
+}
+function camViews(s) {
+  let cur = { x: 0, y: 0, w: W, h: H }; const out = [];
+  for (const c of s.cam) { const from = viewAtList(out, c.t) || cur; const to = targetView(c); out.push({ t: c.t, dur: c.dur, from, to }); cur = to; }
+  return out;
+}
+function viewAtList(list, t) {
+  let v = null;
+  for (const c of list) {
+    if (t < c.t) break;
+    const p = ease(prog(t, c.t, c.dur));
+    v = { x: c.from.x + (c.to.x - c.from.x) * p, y: c.from.y + (c.to.y - c.from.y) * p, w: c.from.w + (c.to.w - c.from.w) * p, h: c.from.h + (c.to.h - c.from.h) * p };
+  }
+  return v;
+}
+const viewAt = (s, lt) => viewAtList(s.views, lt) || { x: 0, y: 0, w: W, h: H };
+function cursorAt(s, lt) {
+  const p = s.path; if (!p.length) return null;
+  if (lt <= p[0][0]) return { x: p[0][1], y: p[0][2] };
+  let i = 0; while (i < p.length - 1 && p[i + 1][0] <= lt) i++;
+  if (i === p.length - 1) return { x: p[i][1], y: p[i][2] };
+  const a = p[i], b = p[i + 1], k = (lt - a[0]) / Math.max(1e-6, b[0] - a[0]);
+  return { x: a[1] + (b[1] - a[1]) * k, y: a[2] + (b[2] - a[2]) * k };
+}
+const toScreen = (v, x, y) => ({ x: (x - v.x) * (W / v.w), y: (y - v.y) * (H / v.h), z: W / v.w });
+async function drawFootage(ctx, s, lt) {
+  const im = await img(frameAt(s, lt)); const v = viewAt(s, lt);
+  ctx.drawImage(im, v.x * SRC, v.y * SRC, v.w * SRC, v.h * SRC, 0, 0, W, H);
+  return v;
+}
+const sceneAt = (t) => { let s = TL.scenes[0]; for (const x of TL.scenes) if (t >= x.start) s = x; return s; };
+const show = (el, on) => el.classList.toggle('hidden', !on);
+
+function renderStickers(list, lt) {
+  $('stickers').innerHTML = list.filter((k) => lt >= k.t && lt <= k.t + k.dur).map((k) => {
+    const a = prog(lt, k.t, 0.35), out = prog(lt, k.t + k.dur - 0.3, 0.3);
+    return `<div class="sticker${isEmoji(k.text) ? ' emoji' : ''}" style="left:${k.x}px;top:${k.y}px;font-size:${k.size}px;opacity:${Math.min(a * 3, 1) * (1 - out)};transform:translate(-50%,-50%) rotate(${k.rot}deg) scale(${0.4 + 0.6 * back(a)})">${esc(k.text)}</div>`;
+  }).join('');
+}
+
+window.renderAt = async (t) => {
+  const s = sceneAt(t); const lt = t - s.start;
+  Object.values(cardEl).forEach((el) => show(el, false));
+  $('rings').innerHTML = ''; $('ripples').innerHTML = ''; show($('cursor'), false); $('prev').style.opacity = 0; $('stickers').innerHTML = '';
+  const onEnd = s.endAt !== undefined && lt >= s.endAt;
+
+  if (s.type === 'card') {
+    const el = cardEl[s.id]; show(el, true); T[s.card.template].draw(el, s.card, lt, s);
+  } else {
+    const ft = s.endAt !== undefined ? Math.min(lt, s.endAt) : lt;
+    const v = await drawFootage(fctx, s, ft);
+    $('rings').innerHTML = s.rings.filter((r) => lt >= r.t && lt <= r.t + r.dur).map((r) => {
+      const a = toScreen(v, r.rect.x, r.rect.y), b = toScreen(v, r.rect.x + r.rect.w, r.rect.y + r.rect.h);
+      const pin = easeOut(prog(lt, r.t, 0.35)), out = prog(lt, r.t + r.dur - 0.35, 0.35);
+      return `<div class="ring" style="left:${a.x}px;top:${a.y}px;width:${b.x - a.x}px;height:${b.y - a.y}px;opacity:${pin * (1 - out)};transform:scale(${1.12 - 0.12 * pin})"></div>`;
+    }).join('');
+    $('ripples').innerHTML = s.clicks.filter((c) => lt >= c[0] && lt <= c[0] + 0.5).map((c) => {
+      const p = prog(lt, c[0], 0.5), q = toScreen(v, c[1], c[2]); const r = (10 + 34 * easeOut(p)) * Math.min(q.z, 1.8);
+      return `<div class="ripple" style="left:${q.x - r}px;top:${q.y - r}px;width:${r * 2}px;height:${r * 2}px;opacity:${0.9 * (1 - p)}"></div>`;
+    }).join('');
+    const cp = cursorAt(s, ft);
+    if (cp && !onEnd) {
+      const q = toScreen(v, cp.x, cp.y); const press = s.clicks.some((c) => lt >= c[0] && lt <= c[0] + 0.14);
+      const sc = Math.min(1 + (q.z - 1) * 0.6, 1.7) * (press ? 0.86 : 1);
+      $('cursor').style.transform = `translate(${q.x - 4 * sc}px,${q.y - 2 * sc}px) scale(${sc})`; show($('cursor'), true);
+    }
+    renderStickers(s.stickers, lt);
+    // crossfade in from the previous scene's last picture (an intro card fades in over it, slower: it often flips dark/light)
+    const pv = TL.scenes[TL.scenes.indexOf(s) - 1]; const xf = s.intro ? 0.6 : 0.35;
+    if (lt < xf && pv) {
+      if (pv.type === 'footage') await drawFootage(pctx, pv, pv.endAt ?? pv.dur);
+      else { const bg = getComputedStyle(cardEl[pv.id]).backgroundColor; pctx.fillStyle = /rgba\(0, 0, 0, 0\)/.test(bg) ? '#e6eef6' : bg; pctx.fillRect(0, 0, W, H); }
+      $('prev').style.opacity = s.intro ? 1 : 1 - ease(lt / 0.35);
+    }
+    if (s.intro && lt < s.intro.untilT + 0.5) {
+      const el = cardEl[s.id + ':intro']; show(el, true); T[s.intro.template].draw(el, s.intro, lt, s);
+      // linear fade in: an eased dark/light flip reads as a flash. Fades out to the footage at `until`.
+      el.style.opacity = (pv ? Math.min(1, lt / xf) : 1) * (1 - prog(lt, s.intro.untilT, 0.5));
+      show($('cursor'), false); $('rings').innerHTML = ''; $('ripples').innerHTML = '';
+    }
+  }
+  if (onEnd) { show(cardEl.end, true); T[TL.end.template].draw(cardEl.end, TL.end, lt - s.endAt, s); }
+  const c = TL.captions.find((x) => t >= x.t0 && t < x.t1);
+  if (c && !onEnd) { $('cap').textContent = c.text; show($('cap'), true); } else show($('cap'), false);
+  $('fade').style.opacity = Math.max(1 - t / 0.5, prog(t, TL.total - 0.8, 0.8));
+};
+</script>
+</body>
+</html>

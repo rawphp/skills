@@ -1,0 +1,6 @@
+{
+  "name": "product-intro-video-engine",
+  "private": true,
+  "type": "module",
+  "dependencies": { "playwright": "^1.55.0" }
+}

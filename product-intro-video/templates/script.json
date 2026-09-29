@@ -1,0 +1,41 @@
+[
+  {
+    "id": "s01",
+    "vo": "Until now, this lived in spreadsheets and email threads. Nobody was sure which copy was current.",
+    "card": {
+      "template": "grid",
+      "window": "Shared Drive › Team",
+      "icon": "xls",
+      "items": [
+        { "text": "Tracker.xlsx", "at": "spreadsheets" },
+        { "text": "Tracker v2.xlsx", "at": "email" },
+        { "text": "Re: Fwd: tracker", "icon": "📧", "at": "threads." },
+        { "text": "Tracker (latest).xlsx", "at": "Nobody" }
+      ]
+    }
+  },
+  {
+    "id": "s02",
+    "vo": "Now it lives in Feature Name. Here's a short tour.",
+    "card": {
+      "template": "title",
+      "eyebrow": "PRODUCT NAME",
+      "title": "Feature Name",
+      "sub": { "text": "A tour for the audience", "at": "tour." }
+    }
+  },
+  { "id": "s03", "vo": "It all starts on the list. Pick a row, and there it is." },
+  {
+    "id": "s04",
+    "vo": "When something changes, the app emails the right people. Then they pick it up here.",
+    "intro": {
+      "template": "stack",
+      "heading": "The app sends the updates",
+      "items": [
+        { "icon": "mail", "from": "From: The Team", "title": "Your item is ready", "sub": "Sent when it opens", "at": "emails" },
+        { "icon": "mail", "tone": "highlight", "from": "From: The Team", "title": "Reminder: your item", "sub": "A few days later", "at": "people." }
+      ],
+      "until": { "at": "Then", "off": -0.2 }
+    }
+  }
+]

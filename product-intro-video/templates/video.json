@@ -1,0 +1,26 @@
+{
+  "output": "intro.mp4",
+  "app": {
+    "base": "http://localhost:3000",
+    "login": "/?as=demo.user",
+    "hideCss": "nextjs-portal{display:none!important}",
+    "localStorage": {}
+  },
+  "reset": { "cmd": "make seed-demo", "cwd": "/abs/path/to/repo", "before": ["s03"] },
+  "voice": { "id": "<voice_id>", "model": "eleven_multilingual_v2", "stability": 0.5, "similarity": 0.8, "style": 0.25, "speed": 0.97 },
+  "captions": { "replace": { "R and D": "R&D" } },
+  "brand": { "primary": "#312e81", "accent": "#38bdf8", "accent2": "#a78bfa", "highlight": "#fbbf24", "ink": "#111827" },
+  "music": { "file": "audio/music.mp3", "from": "s02", "lufs": -27 },
+  "sfx": {},
+  "end": {
+    "eyebrow": "PRODUCT NAME",
+    "title": "Feature Name",
+    "lines": ["Full guides: <b>Help › Feature</b>"],
+    "note": "Demo data throughout.",
+    "dur": 6
+  },
+  "credits": [
+    "Voice: ElevenLabs",
+    "Music: \"Track\" by Artist (source), licence"
+  ]
+}
