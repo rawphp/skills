@@ -31,7 +31,7 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 | `claim_req` | `req_claim` | `{ project, req, agent_id }` |
 | `heartbeat_req` | `req_heartbeat` | `{ project, req, step? }` — `step` ≤40; omitted or blank keeps the last. No second claim |
 | `set_req_status` | `req_set-status` | `{ project, req, status }` backlog/in_progress/stopped/done |
-| `archive_req` | `req_archive` | set `closure_proof` + `done` + checked AC first; `{ project, req }` |
+| `archive_req` | `req_archive` | set `closure_proof` + `done` + every AC checked first; `{ project, req }` |
 | `unblock_req` | `req_unblock` | `{ project, req }` |
 | `append_run_note` | `req_append-run-note` | `{ project, payload, req?, issue? }` |
 | `append_decision` | `decision_append` | `{ project, date, decision, rationale? }` |
@@ -44,11 +44,11 @@ The CLI caches schemas. If `capabilities describe req.heartbeat --no-cache` show
 
 `check_ac` and `step` are best effort. A failed call in Make or Check never blocks. Note it and move on. Ship's fallback still ticks the ACs.
 
-Archive gate needs at least one checked acceptance criterion plus `criteria_approved`. Make and Check already ticked what they proved (`tracker.md` § Acceptance criteria). At Ship, `read_req` and `check_ac` any AC still unticked that the diff proves, with evidence.
+Archive gate: status `done`, non-empty `closure_proof`, and every AC checked. An empty AC list fails, and so does one unchecked AC (`unchecked acceptance criteria`). Make and Check already ticked what they proved (`tracker.md` § Acceptance criteria). At Ship, `read_req` and `check_ac` any AC still unticked that the diff proves, with evidence. An AC the diff cannot prove blocks the archive (`ship.md` § Archive).
 
-**Fallback** when `ac_check` fails (`forbidden` for this PAT, or an older server): don't retry, don't hard-stop. Send the whole list back through `req_set-acceptance-criteria` with each item's `id`, `body` and `is_checked: true` (ids survive), and put the evidence in `closure_proof`. If an older REQ has no ACs at all, `req_set-acceptance-criteria` with items `{ "body": "…", "is_checked": true }` from `done:` (any other shape fails and leaves the list empty), then set `criteria_approved: true` via `req update`.
+**Fallback** when `ac_check` fails (`forbidden` for this PAT, or an older server): don't retry, don't hard-stop. Send the whole list back through `req_set-acceptance-criteria` with each item's `id`, `body` and `is_checked: true` (ids survive), and put the evidence in `closure_proof`. If an older REQ has no ACs at all, `req_set-acceptance-criteria` with items `{ "body": "…", "is_checked": true }` from `done:` (any other shape fails and leaves the list empty).
 
-MCP death after claim: leave claimed. `/dw` resume or unblock after MCP recovers. Never markdown.
+MCP death after claim: leave claimed and stop the heartbeat loop (`tracker.md` § Heartbeat loop). `/dw` resume or unblock after MCP recovers. Never markdown.
 
 ## Hard-stop
 

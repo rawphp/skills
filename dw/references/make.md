@@ -10,7 +10,7 @@ Load at step 3, and again when Check feeds findings back.
 - `cd` into the worktree on every command.
 - Linear graph + already isolated → this session. **split** → one worktree per REQ, merge one at a time.
 - Heartbeat `step: Make` when Make starts (`Fix r<N>` when Check fed it) and after every commit (`references/tracker.md` § Step).
-- 3 failed implement/test attempts on the same unit → `set_req_status` stopped, stop the heartbeat loop, Keep as `blocked`. Do not grind.
+- 3 failed implement/test attempts on the same unit → `set_req_status` stopped, stop the heartbeat loop (`references/tracker.md` § Heartbeat loop), Keep as `blocked`. Do not grind.
 - When a coherent slice is green, commit it (`references/commits.md`). Do not hold the unit until Ship.
 - Right after that commit, `check_ac` each AC its tests prove, evidence `<test name or file::test> @ <short sha>` (`references/tracker.md` § Acceptance criteria). Do not save ticks for archive.
 

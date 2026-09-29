@@ -3,12 +3,28 @@
 # Beats every DW_HEARTBEAT_INTERVAL seconds (default 300) without `step`, so the
 # server keeps dw's last step. Exits within one interval after owner_pid dies,
 # so a dead run still goes stale. A failed beat does not stop the loop.
+#
+# `stop <pidfile>` ends the loop named in the pid file and removes the file. It
+# kills only a heartbeat-loop.sh process, so a stale pid file spares whatever
+# now holds that pid.
 set -u
 
 usage() {
   echo "usage: heartbeat-loop.sh <profile> <project> <req> <owner_pid>" >&2
+  echo "       heartbeat-loop.sh stop <pidfile>" >&2
   exit 2
 }
+
+if [ "${1:-}" = stop ]; then
+  [ "$#" -eq 2 ] || usage
+  pid="$(cat "$2" 2>/dev/null)"
+  case "$pid" in
+  '' | *[!0-9]*) ;;
+  *) ps -p "$pid" -o command= 2>/dev/null | grep -q heartbeat-loop.sh && kill "$pid" 2>/dev/null ;;
+  esac
+  rm -f "$2"
+  exit 0
+fi
 
 [ "$#" -eq 4 ] || usage
 profile="$1"

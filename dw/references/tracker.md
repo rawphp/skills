@@ -17,7 +17,7 @@ No ideate, verify/close reports, milestones, migrate, markdown, sqlite.
 
 ## Claim
 
-Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change (§ Step) and after every commit, and keep the heartbeat loop running (§ Heartbeat loop). The server treats silence as a dead run. Recover: **resume** (clear the light, restart the heartbeat loop, heartbeat with the step, continue Make) or **unblock** (back to backlog, stop the loop). Never stash.
+Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change (§ Step) and after every commit, and keep the heartbeat loop running (§ Heartbeat loop). The server treats silence as a dead run. Recover: **resume** (clear the light, restart the heartbeat loop, heartbeat with the step, continue Make) or **unblock** (back to backlog). Never stash.
 
 ## Step
 
@@ -58,13 +58,23 @@ nohup bash <skill-root>/scripts/heartbeat-loop.sh <profile> <project> <REQ> <own
 echo $! >"$pidf"
 ```
 
-Stop it after `archive_req`, on `unblock_req`, on `set_req_status stopped`, and before starting another for the same REQ (resume):
+Stop it on every exit that leaves the session alive, or it keeps a unit fresh that nobody is working:
+
+- after `archive_req`
+- on `unblock_req`
+- on `set_req_status stopped` (review cap, 3 strikes, user stop)
+- when Ship will not archive (an AC it cannot prove)
+- on hard-stop after claim (tracker or MCP down)
+- on an interrupt that leaves the unit claimed
+- before starting another for the same REQ (resume)
+
+Resume restarts it. Each exit site points here.
 
 ```bash
-pid=$(cat "$pidf" 2>/dev/null) && ps -p "$pid" -o command= | grep -q heartbeat-loop.sh && kill "$pid"; rm -f "$pidf"
+bash <skill-root>/scripts/heartbeat-loop.sh stop "$pidf"
 ```
 
-The `ps` check keeps a stale pid file from killing an unrelated process.
+`stop` kills only a `heartbeat-loop.sh` process, so a stale pid file spares whatever now holds that pid. It removes the pid file.
 
 - `<owner_pid>`: the agent session process. Claude Code: `$PPID` in the Bash tool's shell (the `claude` process). Other hosts: the host's own pid if known, else the pid of a shell that lives as long as the session. A per-command shell dies at once and takes the loop with it.
 - `<profile>`: the `capabilities` profile that `auth status` shows logged in for `base_url` (usually `default`). No CLI login → skip the loop; step beats carry the claim.
@@ -86,7 +96,7 @@ The `ps` check keeps a stale pid file from killing an unrelated process.
 
 ## Hard-stop
 
-Unusable configured backend → stop. Template lives in the backend file. Never write `REQ-*.md` as a substitute.
+Unusable configured backend → stop. After claim, stop the heartbeat loop (§ Heartbeat loop). Template lives in the backend file. Never write `REQ-*.md` as a substitute.
 
 ## Lights on the tracker
 

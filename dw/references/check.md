@@ -36,7 +36,7 @@ When that Make is green, commit the cycle (`references/commits.md`, `fix(<id>):`
 
 Cycle starts at 1 after the first review. Empty actionable set → Ship. Else review again.
 
-**Max 5.** At 5 with findings still open: `set_req_status` stopped, stop the heartbeat loop, list leftovers, do not archive, do not open a "good enough" PR unless the user interrupted with **ship**.
+**Max 5.** At 5 with findings still open: `set_req_status` stopped, stop the heartbeat loop (`references/tracker.md` § Heartbeat loop), list leftovers, do not archive, do not open a "good enough" PR unless the user interrupted with **ship**.
 
 ## 5. Interrupt
 
@@ -44,7 +44,7 @@ After a review report, before the next Make, honor:
 
 | User says | Action |
 |-----------|--------|
-| stop / enough / leave it | Keep as partial. Leave claimed or `stopped` as they said. No PR unless they also said ship. |
+| stop / enough / leave it | Keep as partial. Leave claimed or `stopped` as they said, and stop the heartbeat loop either way (`references/tracker.md` § Heartbeat loop). No PR unless they also said ship. |
 | ship | PR with remaining **non-blockers** on the receipt. Blockers still refuse unless they named those leftovers. |
 
 Do not ask every cycle. Only interrupt when they speak.

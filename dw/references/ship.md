@@ -31,4 +31,6 @@ After the PR URL: remove the worktree. Keep the branch. Return to the primary ch
 
 `read_req`. `check_ac` any AC still unticked that the diff proves, with evidence (`references/tracker.md` § Acceptance criteria). If `check_ac` fails, use the backend file's fallback.
 
-Then `archive_req` (backend file), then stop the heartbeat loop. Do not archive if Check stopped with open blockers and the user did not ship.
+The archive gate needs every AC checked. An AC still unticked that the diff cannot prove: do not archive. Raise **human** naming the AC, and stop the heartbeat loop (`references/tracker.md` § Heartbeat loop).
+
+Otherwise `archive_req` (backend file), then stop the heartbeat loop (same section). Do not archive if Check stopped with open blockers and the user did not ship.
