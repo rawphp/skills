@@ -42,11 +42,14 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 
 The CLI caches schemas. If `capabilities describe req.heartbeat --no-cache` shows no `step`, the server predates it. Heartbeat without `step`, since the CLI validates locally and refuses unknown fields.
 
-`check_ac` and `step` are best effort. A failed call in Make or Check never blocks. Note it and move on. Ship's fallback still ticks the ACs.
+`check_ac` and `step` are best effort. A failed call in Make or Check never blocks. Note it and move on. Ship's fallback still ticks the proven ACs.
 
 Archive gate: status `done`, non-empty `closure_proof`, and every AC checked. An empty AC list fails, and so does one unchecked AC (`unchecked acceptance criteria`). Make and Check already ticked what they proved (`tracker.md` § Acceptance criteria). At Ship, `read_req` and `check_ac` any AC still unticked that the diff proves, with evidence. An AC the diff cannot prove blocks the archive (`ship.md` § Archive).
 
-**Fallback** when `ac_check` fails (`forbidden` for this PAT, or an older server): don't retry, don't hard-stop. Send the whole list back through `req_set-acceptance-criteria` with each item's `id`, `body` and `is_checked: true` (ids survive), and put the evidence in `closure_proof`. If an older REQ has no ACs at all, `req_set-acceptance-criteria` with items `{ "body": "…", "is_checked": true }` from `done:` (any other shape fails and leaves the list empty).
+**Fallback** when `ac_check` fails (`forbidden` for this PAT, or an older server): don't retry, don't hard-stop. Send the whole list back through `req_set-acceptance-criteria` with each item's `id` and `body` (ids survive). Add `is_checked: true` only on the ACs the diff proves; leave `is_checked` off the rest so the server keeps their state. Put each proven AC's evidence in `closure_proof`. Any AC still unticked blocks the archive (`ship.md` § Archive). If an older REQ has no ACs at all, `req_set-acceptance-criteria` with items `{ "body": "…", "is_checked": true }` from `done:` (any other shape fails and leaves the list empty).
+
+`Not authorized to invoke "ac.check"`, even on the control profile, means the PAT predates the capability: a scoped PAT keeps the capability list it was minted with. Use the fallback for this run, put each AC's evidence in `closure_proof`, and tell the user to mint a fresh `dowork.control` PAT.
+Same for `step`: if `req.heartbeat` refuses it once the server has it, beat without `step` and ask for the fresh PAT.
 
 MCP death after claim: leave claimed and stop the heartbeat loop (`tracker.md` § Heartbeat loop). `/dw` resume or unblock after MCP recovers. Never markdown.
 
