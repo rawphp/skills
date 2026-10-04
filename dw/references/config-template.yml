@@ -15,8 +15,12 @@ tracker:
       stopped: Canceled
       done: Done
 models:
-  default: grok
+  # Orchestrator = the session running /dw (Opus 5.5).
+  default: sonnet # Maker: make, debug, fixes
   available:
-    grok:
-      id: grok-4.6
+    sonnet:
+      id: claude-sonnet-5-5
+      via: host
+    opus: # Checker: first non-default key
+      id: claude-opus-5-5
       via: host

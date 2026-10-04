@@ -29,11 +29,11 @@ Each selected file in `references/reviewers/<name>.md` is the whole prompt plus:
 - Contract `done` / `out` / `settled`
 - Output shape below
 
-One concurrent batch. Checker model from `references/models.md`. In cmux: visible panes, done token, parent watch, close after collect (`cmux` skill). Outside cmux: host parallel subagents.
+One concurrent batch of host parallel subagents. Checker model from `references/models.md`.
 
 Maker session does not play a persona.
 
-One worktree → at most **one** reviewer (usually `testing`) may edit files; it restores with `git checkout` and ends on a clean `git status`. Every other persona is strictly read-only (read `git show HEAD:<path>` if code looks changed). After cycle 1, close the read-only panes and keep the mutating one alive; its re-check is "re-run your surviving mutants." If the maker model changes, keep at least one reviewer on a different model.
+One worktree → at most **one** reviewer (usually `testing`) may edit files; it restores with `git checkout` and ends on a clean `git status`. Every other persona is strictly read-only (read `git show HEAD:<path>` if code looks changed). After cycle 1, drop the read-only reviewers and keep the mutating one; its re-check is "re-run your surviving mutants." If the maker model changes, keep at least one reviewer on a different model.
 
 ## Merge
 

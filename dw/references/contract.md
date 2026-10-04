@@ -24,7 +24,7 @@ Optional `settled:` lines. Later Check/Make must not invert them.
 
 `test:` must be able to fail `done`. For client-rendered UI, point it at a test that mounts or renders the changed UI, not an HTTP shell/component-name assertion that stays green when the copy is gutted.
 
-Contract change mid-unit (user edits a line): never send it into a working pane — mid-turn text arrives beside a tool result and a careful worker rightly refuses it. Write it into the next packet (Check-fix or a `-change` packet), say whose decision it is and that it overrides the earlier line, and send the pointer only when the pane composer is idle.
+Contract change mid-unit (user edits a line): never send it into a running worker — mid-turn text arrives beside a tool result and a careful worker rightly refuses it. Write it into the next packet (Check-fix or a `-change` packet), say whose decision it is and that it overrides the earlier line, and send the pointer only when the worker is idle.
 
 ## L + scope
 

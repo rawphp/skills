@@ -92,6 +92,8 @@ Report:
 - the reset run and servers stopped
 - how to retake a scene: `rec.mjs <id>`, then build, render and mix
 
+For a YouTube upload, hand off to `youtube-package` (thumbnails, titles, description with chapters).
+
 ## Stop
 
 | Condition | Action |

@@ -43,6 +43,7 @@ Apply at every depth:
 3. **Boring over magic** — Brittle, ad-hoc, or "magic" behavior that hides simple structure is a problem.
 4. **Right layer + reuse** — Feature logic in shared paths, wrong package, or bespoke helpers when a canonical one exists — call it out.
 5. **High conviction only** — Prefer fewer, sharper comments. No cosmetic drive-bys when larger issues exist.
+6. **Cutover completeness** — Write/insert plus a later `delete()` is unfinished if compact/read never switched. Cite both call-sites. Isolation tests that name a join do not prove the daemon calls it. See [references/review-traps.md](references/review-traps.md).
 
 ### Shared finding priority
 
@@ -191,6 +192,7 @@ Rules:
 - If light finds nothing: say so under Findings; Verdict Approve is fine.
 - No low-value nit lists when larger structural issues exist.
 - Deep: still prioritize; thorough ≠ every cosmetic note.
+- Immediately before writing findings, re-read every production file in scope. If a helper appeared mid-pass, grep its call-sites again. Do not ship citations from the opening read.
 
 ---
 
@@ -199,3 +201,4 @@ Rules:
 - Default target: **current branch changes** (diff vs base branch), unless the user names another target (PR, commit range, paths).
 - Do not expand into an unrelated full-repo audit unless the user asked for that (usually deep + explicit).
 - Preserve behavior; recommendations are structural/maintainability, not feature changes.
+- When the range is an integration of similar tickets, judge merged duplication across files (see review-traps), not each commit in isolation.

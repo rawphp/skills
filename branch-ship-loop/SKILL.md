@@ -19,7 +19,7 @@ Do not stop after a single pass. Do not ship a half-fixed branch.
 |-------|-----------|
 | `code-review` | Maintainability / structure gate (depth light \| medium \| deep) |
 | `release-safe` | Compatibility / breaking-change / ship-risk gate (read-only method) |
-| `do-work` | Full work cycle for **non-simple** fixes: Intake → Ideate → Capture and go |
+| `do-work` | Full work cycle for **non-simple** fixes: Intake → Ideate → Capture, then serial TDD on the review branch |
 | **this skill** | Orchestrates gates, classifies fix complexity, applies simple fixes, dispatches do-work for the rest |
 
 Load full instructions when each phase starts:
@@ -35,8 +35,8 @@ do-work     → ~/.agents/skills/do-work/SKILL.md (hub may point at ~/EA/project
 ## Hard rules
 
 1. **Stay on the branch under review.** Default: current `HEAD` branch. Override only if the user names a branch; check it out only if clean or the user confirmed discarding/moving WIP.
-2. **Re-assert branch on the critical path.** Before A3/B3 edits and before the completion commit: `git rev-parse --abbrev-ref HEAD` must match the branch under review. Preconditions are not sticky — parallel agents/worktrees can switch a shared checkout. If drifted: `git checkout <review-branch>` only if clean, else stop and report.
-3. **Finding classification is tip-relative.** On long/deep passes, before do-work Intake: re-check open finding paths on **current HEAD** (and tracker Done). If the work already landed, re-run the gate phase — do not invent a second UR. A prior READY/Approve on this branch is not evidence a cutover is done — re-check every helper/call-site of the old flag/contract before Approve.
+2. **Re-assert branch on the critical path.** Before A3/B3 edits and before the completion commit: `git rev-parse --abbrev-ref HEAD` must match the branch under review. Preconditions are not sticky — parallel agents/worktrees can switch a shared checkout. If drifted: `git checkout <review-branch>` only if clean, else stop and report. Immediately before each A3/B3 edit, `git status` + `git diff` the finding paths. If the tree already contains the intended shrink/delete, keep it and only fill gaps. Do not revert aligned concurrent work.
+3. **Finding classification is tip-relative.** On long/deep passes, before do-work Intake: re-check open finding paths on **current HEAD** (and tracker Done). If the work already landed, re-run the gate phase — do not invent a second UR. A prior READY/Approve on this branch is not evidence a cutover is done — re-check every helper/call-site of the old flag/contract before Approve. If cited paths still match a residual named on a closed Issue and the production join is unchanged, keep it residual — do not Intake. Re-open only when a helper or call-site of that law changed after the residual was written.
 4. **Target = branch vs default base** (`origin/main` / `main` / `origin/master`). Same base as `code-review` and `release-safe`.
 5. **Review/gate first, then fix.** Never "fix while reviewing." Emit the full phase report, then fix open items, then re-run the phase.
 6. **Only fix findings from that phase.** No drive-by refactors, no feature work, no unrelated cleanups.
@@ -99,11 +99,15 @@ Examples that stay simple: CHANGELOG/upgrade-note fill-in; document a named 0.x 
 | Finding class | Usually |
 |---------------|---------|
 | Missing CHANGELOG / one-line restore / sticky flag / display regression / executable-bit probe | **simple** |
+| Duplicated presentational chrome with existing view tests as AC | **simple** — extract the wrapper inline. Do not Intake |
 | Dual-surface or incomplete cutover when domain/store already owns the behavior | **simple** — add only missing tokens to existing copies, or delete dead wire. Do not invent a new process/worker/binary |
 | Type landed outside a plan-named package | **simple** — move type + tests + call-sites. New package design or import-cycle = **non-simple** |
 | Restricted-role / capability DENY | **simple** — inventory every mutation and sibling of that class (not sample list/show GETs); wrap + matrix + inventory test |
 | Test-file call-site classifier (300+ line brace scanner) | **simple** — file allowlist + forbid elsewhere; do not extract the parser |
 | Review judo that would add or remove listeners on an existing event | **residual** — do not open do-work |
+| Peer-package vendor/dep patch locked by tests on the consuming branch | **residual** — do not Intake; do not block READY. Fix the peer, then bump |
+| Sibling verbs a first slice does not call yet | **residual** — do not Intake "finish the protocol". Write-without-read of an existing helper is incomplete cutover (simple, wire-or-delete), not residual |
+| User-named upcoming-churn spec (its Files table + named wire/copy) | **residual** — do not A3 or Intake those paths. Gate the remainder. READY this pass does not ship-clear the deferred spec |
 | New pure module + tests + multi-handler rewire of a status/lifecycle machine | **non-simple** (do-work) |
 | Auth, schema, dual-write, multi-approach API restore | **non-simple** |
 
@@ -135,35 +139,35 @@ For each non-simple item (or tightly related cluster), run the **entire** do-wor
 
 1. **Intake** — record the brief as the next UR (`/do-work intake` / agents/intake.md)
 2. **Ideate** — assumptions, risks, connections + ideate gate (`/do-work ideate` / agents/ideate.md). Honor Grill / Continue / Stop. **Stop** ends this item; report and do not Capture.
-3. **Capture and go** — decompose into REQs (`/do-work capture` / agents/capture.md), then verify + run (`/do-work go` / agents/go.md). Prefer `go --auto-fix` when gaps are mechanical so the loop does not stall on coverage nits that capture should own.
+3. **Capture, then serial TDD on the review branch** — decompose into REQs (`/do-work capture` / agents/capture.md), then serial in-session TDD and the REQ commit on the branch under review. Do not run go Stage B merge onto the integration base. Prefer mechanical coverage fills in-session so the loop does not stall on nits that capture should own.
 
 Equivalent orchestrators (same full cycle, still **must** include ideate):
 
 ```text
 /do-work start <brief>     # intake + ideate + capture (default includes ideate — never pass --no-ideate from this skill)
-/do-work go <UR-NNN>       # verify + conditional run  (= "capture and go" second half after capture)
+# then serial in-session TDD + REQ commit on the review branch — not /do-work go Stage B merge
 ```
 
-If using `start` then `go`, that is the full cycle. **Never** pass `--no-ideate` from branch-ship-loop.
+If using `start`, that covers Intake → Ideate → Capture. **Never** pass `--no-ideate` from branch-ship-loop. **Never** run go Stage B merge onto the integration base from this skill.
 
 ### How to invoke
 
 1. Read `do-work/SKILL.md` fully, then the phase agent files as that skill requires (`agents/intake.md`, `ideate.md`, `capture.md`, `go.md` / start+go).
 2. Ensure the project has do-work installed/conforming (`/do-work install` or conformance path as do-work specifies) before Intake if `.do-work/` is missing.
-3. **Before Intake:** re-verify the finding against live HEAD and tracker Done (tip-relative). Prefer resuming an open REQ under a standing UR over a new milestone when that id already owns the work.
+3. **Before Intake:** re-verify the finding against live HEAD and tracker Done (tip-relative). Prefer resuming an open REQ under a standing UR over a new milestone when that id already owns the work. List in-progress and done-unarchived claims whose Files overlap the finding paths. Live heartbeat → do not Intake, do not `unblock`. Report NOT READY with the occupying REQ id. Resume after that claim archives.
 4. Build a **verbatim-quality brief** from the gate finding(s). The brief must include:
    - Source: `code-review` or `release-safe`
    - Branch + base
    - Finding/issue text (severity, client impact, mitigation missing)
    - Hard constraints: preserve required behavior unless the issue is an intentional contract restore; stay on this branch; no drive-by scope
    - Definition of done: re-running the originating gate phase must clear this item
-5. Run the three steps in order (or `start` then `go`).
+5. Run the three steps in order (or `start`, then serial TDD on the review branch — not `go` Stage B merge).
 6. After do-work finishes (or stops), return here and **re-run the originating phase** (A1 or B1). Do not claim READY without re-gate.
 
 ### do-work defaults under ship-loop
 
 - Ideate gate: ship-loop intent is usually **Continue** (fix until gates pass), not Grill — still run ideate observations into the UR.
-- Prefer **serial in-session TDD on the review branch** for Size/S pure extracts (≈2–3 files) over long worktree fan-out.
+- After Capture on the named review branch: **serial in-session TDD and the REQ commit on that branch**. Do not run go Stage B merge onto the integration base. Size/S pure extracts (≈2–3 files) stay in-session; do not fan out to worktrees.
 - One small pure-extraction REQ with explicit AC (“transitions unit-tested; SFC/host only dispatches”) closes deep structural findings faster than multi-REQ decomposition.
 - If a **next-phase UR** already claims the same paths (`working/` / Files), open a **new UR** for the ship-loop extract — do not steal claimed files or `unblock` to take them. Ship-loop structural extract ≠ resume the next-phase UR.
 - **Tracker backend owns work-item ids.** Use the returned remote slug for go/claim/archive. Never dual-write local `.do-work/user-requests/` as the store when the project backend is remote (e.g. do-work-io greenfield restarting at UR-001). Commit messages use the remote REQ id; product commits still stay on the review branch.
@@ -184,9 +188,10 @@ If using `start` then `go`, that is the full cycle. **Never** pass `--no-ideate`
 ### A1. Review
 
 1. Read `code-review/SKILL.md` fully.
-2. Run that skill's process on **this branch vs base** at the resolved depth.
+2. Run that skill's process on **this branch vs base** at the resolved depth. If `git diff --stat` is presentational-only (class tokens, scoped CSS) and ≤3 files, emit A1 from the orchestrator HEAD walk — do not spawn. Deep still applies the deep bar; it does not require a subagent.
 3. Capture the full output (Findings + Verdict: **Approve** | **Request changes**).
-4. **Orchestrator owns the A1 verdict.** A review-subagent report is evidence, not the phase verdict. Map it through the `code-review` bar before A2: re-open cited paths and drop false claims; product/UX nits are residual unless that gate owns them. Subagent “Approve with conditions” is **Request changes** only if a surviving finding is a real blocker for that depth. Do not A3 nits or false claims.
+4. **Orchestrator owns the A1 verdict.** A review-subagent report is evidence, not the phase verdict. Map it through the `code-review` bar before A2: re-open cited paths and drop false claims; product/UX nits are residual unless that gate owns them. Before classifying or Intake, confirm the cited lines changed vs base — unchanged pre-existing soup is residual; do not Intake it. Subagent “Approve with conditions” is **Request changes** only if a surviving finding is a real blocker for that depth. Do not A3 nits or false claims.
+5. **Bound the A1 wait.** Omit `model` (inherit parent) or use a slug the host listed. Do not retry a rejected slug. No findings document → kill the subagent and emit A1 from the orchestrator HEAD walk. Do not skip A3 because the reviewer never returned. Kill immediately if the reviewer starts `web_fetch` on a local `base...HEAD` git review. A small diff still on turn 1 after ~60 local reads is wandering — kill then.
 
 ### A2. Branch
 
@@ -199,7 +204,7 @@ If using `start` then `go`, that is the full cycle. **Never** pass `--no-ideate`
 
 1. Classify each open finding: **simple** | **non-simple**.
 2. State the classification in the turn (one line per finding).
-3. **Simple:** fix inline. Priority: regressions → boundary/type contracts → local structure. Prefer smallest change; keep required behavior identical.
+3. **Simple:** fix inline. Priority: regressions → boundary/type contracts → local structure. Prefer smallest change; keep required behavior identical. Before swapping two mutually exclusive contract signals, re-read the consumer's current transition table on HEAD. If a landed test already names one as fail, keep it. Do not swap the two signals to complete the other.
 4. **Non-simple:** run [Non-simple fixes via do-work](#non-simple-fixes-via-do-work) for that finding (or cluster). Do **not** patch it outside do-work.
 5. After the fix batch (inline and/or do-work), re-run **A1**. Round counter: increment on each full A1→A3 cycle. At 3 failures → **Blocked (code-review)** and stop before Phase B unless the user says continue.
 
@@ -236,8 +241,8 @@ Do **not** fix during B1. Complete the gate first (per release-safe).
 | **minor** | Fix if cheap/simple; otherwise residual only if kind policy allows Approved with empty Issues |
 
 3. **Simple:** apply the obvious remediation (CHANGELOG bullets with consumer impact, restore export, remove secret from tree, etc.). Prefer mitigation that matches **kind** (library vs project vs monorepo-mixed).
-4. **Monorepo / kind notes:** Do not invent CHANGELOG debt for app-owned SPA chrome unless that package publishes externally. Do name Unreleased consumer impact for a **published agent/binary or library** wire change, package migrations, and runtime cache/index law — even when public types look additive.
-5. **Non-simple:** full do-work cycle — Intake → Ideate → Capture and go. Typical non-simple release items: dual-write/migration design, public API reshape, auth/default flips with real runtime risk.
+4. **Monorepo / kind notes:** Do not invent CHANGELOG debt for app-owned SPA chrome unless that package publishes externally. Do name Unreleased consumer impact for a **published agent/binary or library** wire change, package migrations, and runtime cache/index law — even when public types look additive. Before treating CHANGELOG mitigation as adequate, compare the section heading to `git tag` / the base tip. If that version is already tagged, put new consumer bullets under Unreleased. Do not append to the tagged section. A prior READY that filed notes in the tagged section is still open until they move.
+5. **Non-simple:** full do-work cycle — Intake → Ideate → Capture, then serial TDD on the review branch (not go Stage B merge). Typical non-simple release items: dual-write/migration design, public API reshape, auth/default flips with real runtime risk.
 6. Do not rubber-stamp: do not drop Issues without real fix or adequate mitigation.
 7. After the batch, re-run **B1**. Max 3 rounds. Still failing → **Blocked (release-safe)**.
 
@@ -353,7 +358,7 @@ If READY: branch cleared both gates. If NOT READY: remaining blockers + next hum
 | Dual-surface / incomplete cutover left as residual | Request changes until every consumer of the new law matches (agents + lib + docs); same batch wire-or-delete |
 | Fix would expand product scope | Stop that item; report as human decision (or capture as do-work brief if user wants it in-scope) |
 | Tests fail after a simple fix | Fix the regression or revert before the next re-run |
-| do-work mid-flight on another UR | Do not stomp; new UR for this finding or wait / status |
+| In-flight claim whose Files overlap finding paths | Do not Intake; do not `unblock`. Report NOT READY with the occupying REQ id; resume after that claim archives |
 | Checkout drifted off review branch | Stop edits/commits; re-checkout review branch if clean, else report |
 | Infinite oscillation (fix A breaks B or reverse) | After one cross-phase regression, stop and report conflict |
 

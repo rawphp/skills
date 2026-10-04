@@ -28,7 +28,7 @@ Every op: `search_tool` wire name, then dotted id, or server `dowork.control`. `
 | `set_files` | `req_set-files` | `{ project, req, files }` |
 | `set_blocked_by` | `req_set-blocked-by` | `{ project, req, depends_on }` |
 | `list_claimable_reqs` | `req_list-claimable` | `{ project }` |
-| `claim_req` | `req_claim` | `{ project, req, agent_id }` |
+| `claim_req` | `req_claim` | `{ project, req, agent_id, session? }` — pass `session: $DOWORK_RUN` when that env var is set (a do-work.io terminal session), so the server links the session to this Issue |
 | `heartbeat_req` | `req_heartbeat` | `{ project, req, step? }` — `step` ≤40; omitted or blank keeps the last. No second claim |
 | `set_req_status` | `req_set-status` | `{ project, req, status }` backlog/in_progress/stopped/done |
 | `archive_req` | `req_archive` | set `closure_proof` + `done` + every AC checked first; `{ project, req }` |

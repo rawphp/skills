@@ -38,7 +38,17 @@ export class Rec {
     this.loop = (async () => {
       while (this.capturing) {
         const a = now();
-        const r = await this.cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 88, optimizeForSpeed: true, clip: { x: 0, y: 0, width: 1920, height: 1080, scale: 2 } });
+        // A capture issued while the page navigates can hang forever: time it out and reopen the session.
+        // The clip is in document coordinates: offset it by the page scroll, or a window-scrolling page records its top.
+        const shot = async () => {
+          const { cssVisualViewport: v } = await this.cdp.send('Page.getLayoutMetrics');
+          return this.cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 88, optimizeForSpeed: true, clip: { x: v.pageX, y: v.pageY, width: 1920, height: 1080, scale: 2 } });
+        };
+        const r = await Promise.race([
+          shot().catch(() => null),
+          sleep(1500).then(() => null),
+        ]);
+        if (!r) { await this.cdp.detach().catch(() => {}); await sleep(50); this.cdp = await this.page.context().newCDPSession(this.page); continue; }
         const file = `f${String(n++).padStart(5, '0')}.jpg`;
         fs.writeFileSync(`${this.dir}/${file}`, Buffer.from(r.data, 'base64'));
         this.frames.push({ t: Math.max(0, (a + now()) / 2 - this.t0), file });
@@ -78,7 +88,8 @@ export class Rec {
           const s = getComputedStyle(n);
           if (/(auto|scroll)/.test(s.overflowY) && n.scrollHeight > n.clientHeight + 2) return n;
         }
-        return document.querySelector('main') || document.scrollingElement;
+        const m = document.querySelector('main');
+        return m && m.scrollHeight > m.clientHeight + 2 ? m : document.scrollingElement;
       })();
       const start = scroller.scrollTop; const t0 = performance.now();
       const e = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
@@ -162,7 +173,7 @@ export async function openApp(app, { dsf = 1 } = {}) {
   return { browser, page };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === `file://${fs.realpathSync(process.argv[1])}`) {   // realpath: the skill dir is often a symlink
   const cfg = JSON.parse(fs.readFileSync('video.json'));
   const { default: scenes } = await import(path.resolve('scenes.mjs'));
   const args = process.argv.slice(2); const dry = args.includes('--dry');

@@ -22,6 +22,7 @@ for name, (text, dur) in {**DEFAULT, **extra}.items():
         data=json.dumps({'text': text, 'duration_seconds': dur, 'prompt_influence': 0.6}).encode(),
         headers={'xi-api-key': KEY, 'Content-Type': 'application/json'})
     try:
-        open(out, 'wb').write(urllib.request.urlopen(req).read()); print('made', name)
+        data = urllib.request.urlopen(req).read()  # read first: a failed request must not leave an empty file that later runs skip
+        open(out, 'wb').write(data); print('made', name)
     except urllib.error.HTTPError as e:
         print(name, 'HTTP', e.code, e.read()[:200])

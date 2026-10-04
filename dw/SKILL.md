@@ -56,7 +56,6 @@ Forced S: formatter, lockfile, typo, generated-only.
 | **split** | Disjoint file sets → one REQ + worktree each |
 | **review-deep** | User asked full/deep |
 | **watch** | User asked, or this PR is the release |
-| **visible** | cmux and split |
 | **human** | Dirty tree, irreversible, two product options |
 | **interrupt** | User says stop / enough / ship after a review report |
 
