@@ -25,4 +25,5 @@ for name, (text, dur) in {**DEFAULT, **extra}.items():
         data = urllib.request.urlopen(req).read()  # read first: a failed request must not leave an empty file that later runs skip
         open(out, 'wb').write(data); print('made', name)
     except urllib.error.HTTPError as e:
-        print(name, 'HTTP', e.code, e.read()[:200])
+        err = e.read()[:200].decode('utf-8', 'replace').replace(KEY, '[redacted]')
+        print(name, 'HTTP', e.code, err)

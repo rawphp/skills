@@ -114,3 +114,5 @@ For a YouTube upload, hand off to `youtube-package` (thumbnails, titles, descrip
 - Demo data and demo accounts only. Put "demo data" on screen when a named person is rated or judged.
 - Never mock a real person or customer. Get sign-off on sensitive product labels before a joke uses them.
 - Product selectors and seeds stay in the project folder, never in this skill.
+- The ElevenLabs key stays in `ELEVEN_LABS_API_KEY`. Do not write it into the project folder, `video.json`, or the script.
+- `reset.cmd` runs as a shell command, and the recorder prints it. Use the repo's own seed command.

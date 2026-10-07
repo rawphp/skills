@@ -41,7 +41,8 @@ for i, s in enumerate(script):
     try:
         r = json.load(urllib.request.urlopen(req))
     except urllib.error.HTTPError as e:
-        sys.exit(f"{s['id']}: HTTP {e.code} {e.read()[:300]!r}")
+        err = e.read()[:300].decode('utf-8', 'replace').replace(KEY, '[redacted]')
+        sys.exit(f"{s['id']}: HTTP {e.code} {err!r}")
     open(out + '.mp3', 'wb').write(base64.b64decode(r['audio_base64']))
     a = r['alignment']
     json.dump({'words': words_from(a), 'end': a['character_end_times_seconds'][-1]}, open(out + '.json', 'w'))
