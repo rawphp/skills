@@ -79,7 +79,7 @@ Installer template: [`skills-hub/references/install-template.sh`](./skills-hub/r
 
 ## What’s in here
 
-~150 skills across product, engineering, GTM, content, and agent ops. Highlights by area:
+~250 skills across product, engineering, GTM, content, and agent ops. Highlights by area:
 
 ### Agent platform & meta
 
@@ -92,7 +92,7 @@ Hub wiring, multi-agent orchestration, skill craft, session workflow.
 | [`effective-agent-skills`](./effective-agent-skills/SKILL.md) | How to write skills well |
 | [`delegating-to-agents`](./delegating-to-agents/SKILL.md) | Hand work to Pi / Codex / Claude / Hermes |
 | [`cmux`](./cmux/SKILL.md) | cmux workspaces, panes, agent surfaces |
-| [`do-work`](./do-work) | File-based autonomous task loop (REQ pipeline) |
+| [`dw`](./dw/SKILL.md) | Dark-factory work loop: brief → worktree → TDD → review → PR |
 | [`fable-mode`](./fable-mode/SKILL.md) | Multi-gate discipline for hard / multi-layer work |
 | [`goal-loop`](./goal-loop/SKILL.md) | Long-running plan → act → test → review loops |
 | [`handoff`](./handoff/SKILL.md) | End-of-session handoff for a fresh agent |
@@ -100,7 +100,7 @@ Hub wiring, multi-agent orchestration, skill craft, session workflow.
 | [`skill-optimizer`](./skill-optimizer/SKILL.md) | Eval-driven skill improvement loop |
 | [`skill-seekers`](./skill-seekers/SKILL.md) | Generate skills from docs, repos, PDFs, video |
 
-Also: `agent-self-scheduling`, `codex-subagent`, `creative-collision`, `ideate`, `party-mode`, `tournament`, `saas-thesis`, `prompt-me`, `setup-help`, `teach`, `level-up`, `short`, `remind`, and others under matching folder names.
+Also: `agent-self-scheduling`, `codex-subagent`, `creative-collision`, `ideate`, `party-mode`, `tournament`, `dw-brief`, `dw-work`, `dw-init`, `prompt-me`, `setup-help`, `teach`, `level-up`, `short`, `remind`, and others under matching folder names.
 
 ### Engineering & architecture
 
@@ -141,7 +141,6 @@ Examples: `author`, `editor`, `script-studio`, `ai-avatar-script`, `content-engi
 | Skill | Purpose |
 |-------|---------|
 | [`deep-research`](./deep-research/SKILL.md) | Sourced research reports, fact-check ledgers, decision cards |
-| [`deepapi`](./deepapi/SKILL.md) | Search / scrape / image gen via DeepAPI (policy-gated) |
 | [`defuddle`](./defuddle/SKILL.md) | Clean markdown from web pages |
 | [`researcher`](./researcher/SKILL.md) | Product teardown → BUILD / CONSIDER / SKIP |
 | [`storm-research`](./storm-research/SKILL.md) | Multi-lens STORM HTML briefings (explicit trigger only) |
@@ -152,16 +151,13 @@ Also: `reddit-fetch`, `research-prompt`, `obsidian-cli`, `obsidian-markdown`.
 
 Examples: `vps-server-management`, `xero-copilot`, `file-organizer`, `anti-sleep`, `dummy-dataset`, `draft-nda`, `privacy-policy`, `review-resume`, `building-blog`.
 
-### Bundles & non-skill folders
+### Bundles
 
 | Path | Notes |
 |------|--------|
 | `career-helper/` | Career-helper plugin bundle (skills nested inside) |
 | `marketing-skills/` | Marketing skill pack / plugin tree |
 | `solo-skills/` | Solo-operator skill pack |
-| `resume-tailoring-skill/` | Resume-tailoring package |
-| `configs/` | Shared config snippets (e.g. GitHub Actions) |
-| `docs/` | Plans/specs related to this tree |
 
 ## Create a new skill
 
@@ -189,4 +185,4 @@ chmod +x my-skill/install.sh
 
 - Hub skill: [`skills-hub/SKILL.md`](./skills-hub/SKILL.md)
 - Authoring: [`effective-agent-skills/SKILL.md`](./effective-agent-skills/SKILL.md)
-- Agent health / hub wiring check: `agent-doctor` (if installed)
+- Agent health / hub wiring check: [`agent-doctor/SKILL.md`](./agent-doctor/SKILL.md)
