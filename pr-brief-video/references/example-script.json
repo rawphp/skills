@@ -1,0 +1,145 @@
+[
+  {
+    "id": "s01",
+    "vo": "Pull request twelve. One change on the ledger repo. It stops the invoice total coming from the browser. What changed, and where to look.",
+    "card": {
+      "template": "title",
+      "eyebrow": "LEDGER · PR 12",
+      "title": "Invoice total",
+      "pill": { "text": "1 of 1", "at": "change" },
+      "sub": { "text": "fix/invoice-total → main", "at": "stops" },
+      "hold": 0.5
+    }
+  },
+  {
+    "id": "s02",
+    "vo": "Before this change, the save endpoint trusted the total in the request body. A buyer could post any number and the books stored it.",
+    "card": {
+      "template": "shift",
+      "heading": "Who picked the number?",
+      "header": { "at": "endpoint", "label": "route", "text": "POST /api/invoices · total from the body" },
+      "before": {
+        "at": "Before",
+        "label": "Before",
+        "code": "'total' => 'required|numeric',",
+        "note": "stored as typed"
+      },
+      "punch": { "at": "buyer", "text": "A buyer could post any total" },
+      "hold": 0.5
+    }
+  },
+  {
+    "id": "s03",
+    "vo": "Now the server adds the lines itself. The form still shows a total, labelled Estimate, and the stored total is the one the server computed. A mismatched body answers four twenty two.",
+    "card": {
+      "template": "flow",
+      "heading": "The server owns the total",
+      "lanes": [
+        {
+          "at": "adds",
+          "title": "Save invoice",
+          "sub": "POST /api/invoices",
+          "to": "Sum of the line amounts",
+          "notes": [
+            { "at": "Estimate", "text": "Form shows Estimate · no total input" },
+            { "at": "mismatched", "text": "A body total that disagrees is a 422" }
+          ]
+        },
+        {
+          "at": "stored",
+          "title": "Stored row",
+          "sub": "invoices.total",
+          "to": "The computed sum",
+          "notes": [
+            { "at": "computed", "text": "A body-supplied total is ignored (tested)" }
+          ]
+        }
+      ],
+      "hold": 0.5
+    }
+  },
+  {
+    "id": "s04",
+    "vo": "The check lives in Invoice Resource. The total field is filled from the line sum, and a body total is ignored. The test posts a fake total and expects the sum.",
+    "card": {
+      "template": "code",
+      "heading": "InvoiceResource.php · store()",
+      "blocks": [
+        {
+          "at": "check",
+          "lines": [
+            "$sum = $lines->sum('amount');",
+            "",
+            "'total' => $sum,"
+          ],
+          "mark": { "at": "ignored", "from": 2, "to": 2 }
+        },
+        {
+          "at": "test",
+          "lines": [
+            "$this->post('/api/invoices', ['total' => 1, 'lines' => $lines])",
+            "    ->assertJsonPath('total', 40);"
+          ],
+          "mark": { "at": "expects", "from": 1, "to": 1 }
+        }
+      ],
+      "hold": 0.5
+    }
+  },
+  {
+    "id": "s05",
+    "vo": "Two more. Tax is calculated with the lines, not copied from the form. The receipt email prints the stored total, so it cannot drift from the row.",
+    "card": {
+      "template": "job",
+      "heading": "Two more",
+      "rows": [
+        {
+          "at": "Tax",
+          "icon": "📋",
+          "tone": "accent",
+          "title": "Tax follows the lines",
+          "sub": "The form's tax figure is not stored"
+        },
+        {
+          "at": "receipt",
+          "icon": "✉️",
+          "tone": "highlight",
+          "title": "The receipt prints the stored total",
+          "sub": "Same number as the row"
+        }
+      ],
+      "hold": 0.5
+    }
+  },
+  {
+    "id": "s06",
+    "vo": "Where to look. Store, in Invoice Resource. The fake-total test. Three personas, one cycle, four fixes, zero blockers. After merge, send one invoice on staging and confirm the stored total matches the lines.",
+    "card": {
+      "template": "look",
+      "heading": "Where to look",
+      "files": [
+        {
+          "at": "Store",
+          "path": "InvoiceResource.php",
+          "sym": "store()",
+          "why": "total is the line sum"
+        },
+        {
+          "at": "fake-total",
+          "path": "InvoiceTotalTest.php",
+          "sym": "test_ignores_body_total",
+          "why": "posts 1, expects 40"
+        }
+      ],
+      "review": {
+        "at": "Three",
+        "text": "Review: 3 personas · 1 cycle · 4 fixes on the branch · 0 blockers"
+      },
+      "deploy": {
+        "at": "staging",
+        "text": "After merge: one staging invoice, stored total matches the lines."
+      },
+      "hold": 0.5
+    }
+  }
+]

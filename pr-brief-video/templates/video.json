@@ -1,0 +1,26 @@
+{
+  "output": "prNNN-summary.mp4",
+  "app": { "base": "http://localhost:3000", "login": "/", "hideCss": "", "localStorage": {} },
+  "voice": { "id": "IKne3meq5aSn9XLyUdCD", "model": "eleven_multilingual_v2", "stability": 0.5, "similarity": 0.8, "style": 0.2, "speed": 1.2 },
+  "captions": {
+    "replace": {
+      "four twenty two": "422",
+      "P R": "PR"
+    }
+  },
+  "brand": { "primary": "#312e81", "accent": "#38bdf8", "accent2": "#a78bfa", "highlight": "#fbbf24", "ink": "#111827" },
+  "sfx": {},
+  "end": {
+    "template": "gates",
+    "eyebrow": "PR NNN · GATES ON THE TIP",
+    "title": "Merge after #NNN",
+    "gates": [
+      { "label": "Backend", "value": "N passed" },
+      { "label": "Frontend", "value": "N passed · tsc clean" },
+      { "label": "Infrastructure", "value": "N passed" }
+    ],
+    "note": "branch → base · what merges before and after",
+    "dur": 7
+  },
+  "credits": [ "Voice: ElevenLabs" ]
+}

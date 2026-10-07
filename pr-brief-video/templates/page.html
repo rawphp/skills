@@ -1,0 +1,56 @@
+<title>PR NNN Reviewer Brief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  /* Layout: one column, the video first, then a scene index that doubles as chapter links. */
+  :root {
+    --bg: #f3f7fb; --surface: #ffffff; --fg: #15263d; --muted: #5b6b82; --line: #d8e3ee;
+    --navy: #312e81; --teal: #38bdf8; --amber: #fbbf24; --amber-ink: #5a4300;
+    --display: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0f1a2b; --surface: #182538; --fg: #e8eef7; --muted: #9fb3cc; --line: #2b3c54; --navy: #9fc0ea; --amber-ink: #ffd982; color-scheme: dark } }
+  :root[data-theme="dark"] {
+    --bg: #0f1a2b; --surface: #182538; --fg: #e8eef7; --muted: #9fb3cc; --line: #2b3c54; --navy: #9fc0ea; --amber-ink: #ffd982; color-scheme: dark }
+  body { background: var(--bg); color: var(--fg); font-family: var(--display); margin: 0; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding-block: 32px 64px; padding-inline: 16px; }
+  .eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--teal); font-weight: 800; }
+  h1 { font-size: clamp(26px, 4vw, 40px); margin: 6px 0 8px; letter-spacing: -.02em; text-wrap: balance; color: var(--navy); }
+  .meta { color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 20px; }
+  .meta a { color: inherit; }
+  .meta code { font-family: var(--mono); font-size: 13px; }
+  video { width: 100%; max-width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; display: block; }
+  h2 { font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 36px 0 12px; }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  li { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+  li > div { min-width: 0; }
+  .t { font-family: var(--mono); font-size: 14px; color: var(--teal); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .t button { all: unset; cursor: pointer; color: inherit; }
+  .t button:focus-visible { outline: 2px solid var(--teal); border-radius: 4px; }
+  .s { font-weight: 600; } .d { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .d code { font-family: var(--mono); font-size: 13px; }
+  .deploy { margin-top: 24px; background: color-mix(in srgb, var(--amber) 22%, var(--surface)); border: 1px solid var(--amber); color: var(--amber-ink); border-radius: 10px; padding: 14px 16px; font-size: 15px; line-height: 1.45; }
+  @media (max-width: 480px) { li { grid-template-columns: 1fr; gap: 4px; } }
+</style>
+<div class="wrap">
+  <div class="eyebrow">Reviewer brief</div>
+  <h1>PR NNN — TITLE</h1>
+  <div class="meta">
+    <span><a href="https://github.com/ORG/REPO/pull/NNN">github.com/ORG/REPO/pull/NNN</a></span>
+    <span><code>BRANCH → BASE</code></span>
+    <span>STACK POSITION</span>
+    <span>M min S s</span>
+  </div>
+  <video id="v" controls preload="metadata" src="prNNN-summary.mp4"></video>
+
+  <h2>Scenes</h2>
+  <ol>
+    <li><span class="t"><button data-t="0">0:00</button></span><div><div class="s">SCENE TITLE</div><div class="d">One line on what the card shows.</div></div></li>
+    <li><span class="t"><button data-t="START_SECONDS">M:SS</button></span><div><div class="s">SCENE TITLE</div><div class="d">One line, with <code>symbols()</code> where useful.</div></div></li>
+  </ol>
+
+  <div class="deploy"><strong>Deploy check.</strong> The one thing a reviewer must verify after merge, or what sits outside this PR.</div>
+</div>
+<script>
+  const v = document.getElementById('v');
+  document.querySelectorAll('button[data-t]').forEach((b) => b.addEventListener('click', () => { v.currentTime = Number(b.dataset.t); v.play().catch(() => {}); }));
+</script>
