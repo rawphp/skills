@@ -23,6 +23,8 @@ npm install --prefix "$SK"            # only if check.sh says playwright is miss
 
 If the ElevenLabs line says MISS, stop and ask the user for a key (`export ELEVEN_LABS_API_KEY=...`). Don't brief or walk without one. Note the tier and characters left for the approval gate. The free tier needs attribution and excludes commercial use, so tell the user now if the video is for customers or marketing.
 
+Check free disk too: `df -h` on the project volume and `du -sh` the sibling video folders' `footage/ render/ mix/`. `check.sh` doesn't look at free space, and 4K footage from earlier runs ends a run with `ENOSPC`. Under ~10 GB free, ask the user to clear an approved run's intermediates before briefing.
+
 The app must run locally with seeded demo data and a persona sign-in (dev bypass or demo account). If there is no reset for the data the tour writes, stop and ask.
 
 ## Workflow
@@ -37,6 +39,8 @@ The app must run locally with seeded demo data and a persona sign-in (dev bypass
 ```bash
 mkdir -p "$DIR" && cp "<skill dir>/templates/"* "$DIR/" && cd "$DIR"
 ```
+
+A second video for the same product starts from the first one's folder: copy its reset and stack scripts, `audio/sfx/` (no new ElevenLabs credits) and proven `scenes.mjs` selectors, then re-cue every beat to the new word timings. Rebuild the demo stack from current main first, so the footage matches the shipped UI.
 
 **2. Walk before you write.** Dry-walk the audience's screens as the persona: headless screenshots, or `node "$SK/rec.mjs" --dry <id>` once scenes exist. Note the real states, messages and demo names. The story, and any jokes, come from these.
 

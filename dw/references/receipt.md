@@ -30,4 +30,6 @@ Write to a tempfile and pass `--body-file`. This is the change receipt.
 - path — why
 ```
 
+Write it from the diff, not the plan: check every concrete name (route, queue, flag, table, command) against `git diff <base>..HEAD` before `gh pr create`.
+
 No post-deploy monitoring section unless the user asked. No branding.

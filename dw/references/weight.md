@@ -42,5 +42,6 @@ Any of:
 | "Add settings page" with no design | **L** + **scope** |
 | Two packages, overlapping files | **M** serial, not split |
 | Two packages, disjoint files | **L** + **split** |
+| New endpoint + the one screen that calls it | **M**, one unit. Split only when each half can merge alone and leave the app working |
 
 When in doubt: **M**. S that was M ships bugs. L that was M is the old factories.

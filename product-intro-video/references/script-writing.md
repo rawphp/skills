@@ -18,9 +18,11 @@ There is no fixed shape. Build the scene list from the audience's job and what t
    - the problem before the product: an opening card
    - the product name and who the tour is for: a `title` card
    - where the guides live: the `end` card
-3. Pick a template for each card. `grid` fills a window with files, which suits "the old way". `title` is a brand-colour name card. `stack` slides items in, which suits messages. When none of them fits, write your own in `cards.js` (see `references/api.md`).
+3. Pick a template for each card. `grid` fills a window with files for "the old way", but it has been overused as an opener: build a fresh opener for each video in `cards.js`, from the feature's own villain, and offer it at the gate. `title` is a brand-colour name card. `stack` slides items in, which suits messages. When none of them fits, write your own in `cards.js` (see `references/api.md`).
 
 A feature tour often runs opener, title, 6–10 tasks, close. Use that only when it fits. A two-minute how-to can be all footage behind one title card, and a launch video can lean on cards.
+
+**Validation videos.** When the video exists to check a build against its rules, give each rule a number at the script gate. Show it as a square chip (`r.sticker`, rot 0, one fixed corner) when it is spoken, and keep tilted stickers for jokes. Chips at a fixed spot overlap when a second lands within the first's `dur`, so use one `rule()` helper in `scenes.mjs` that tracks when the last chip ends and drops the next a row lower. Drive each access rule as the persona it is about (sign in per scene in `setup`), not as one all-seeing demo account. After the render, write `rules.md` beside the mp4: rule, chip time (from `timeline.json` stickers), persona and screen, the source line, the code that owns it, and **Shown** or **Stated**, so reviewers know which rules the screen proves and which only the voice claims.
 
 ## Length
 

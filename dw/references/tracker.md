@@ -17,7 +17,7 @@ No ideate, verify/close reports, milestones, migrate, markdown, sqlite.
 
 ## Claim
 
-Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change (§ Step) and after every commit, and keep the heartbeat loop running (§ Heartbeat loop). The server treats silence as a dead run. Recover: **resume** (clear the light, restart the heartbeat loop, heartbeat with the step, continue Make) or **unblock** (back to backlog). Never stash.
+Optimistic re-read. `concurrent-conflict` / `footprint-overlap` / `not-claimable` → stop. Mid-flight death → **leave claimed**. While claimed, `heartbeat_req` at every step change (§ Step) and after every commit, and keep the heartbeat loop running (§ Heartbeat loop). The server treats silence as a dead run. Recover: **resume** (clear the light, restart the heartbeat loop, heartbeat with the step, continue Make) or **unblock** (back to backlog). Workers the dead session spawned died with it: on resume, re-dispatch any review whose report is missing, against the same tip. Never stash.
 
 ## Step
 

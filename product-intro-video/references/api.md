@@ -115,3 +115,5 @@ addCard('quote', {
 ```
 
 Preview a custom card with `render.mjs --at` before the full render.
+
+A fully animated video needs no live app: when every `script.json` line has a `card`, skip `rec.mjs` and `reset`, and write one `addCard` per scene. Every `css` is injected globally, so class names that aren't under their own `.t-<name>` collide across scenes.

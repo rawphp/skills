@@ -23,7 +23,7 @@ After a Check-fix Make, commit **before** the next review wave. Reviewers read t
 
 ## How
 
-From the worktree. Named files only. Never `git add -A` or `git add .`. Never co-author trailers. Never amend a commit that was pushed.
+From the worktree. Named files only. Never `git add -A` or `git add .`. Never co-author trailers. Never amend a commit that was pushed. A trailer on an unpushed tip (a worker obeyed a harness reminder): `git reset --soft HEAD~1` and recommit the same tree before review or push.
 
 ```bash
 cd <worktree> && git status && git diff && git log -5 --oneline

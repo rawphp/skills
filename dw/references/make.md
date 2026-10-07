@@ -9,6 +9,8 @@ Load at step 3, and again when Check feeds findings back.
 - Follow existing patterns. No drive-by refactors.
 - `cd` into the worktree on every command.
 - Linear graph + already isolated → this session. **split** → one worktree per REQ, merge one at a time.
+- Parallel wave size follows the machine, not the unit count. Check free memory before the first wave, start at most two heavy units (build, test, render), and raise the cap only after a wave runs with headroom. Read-only reviewers do not count.
+- A background maker silent for more than about twice its slowest earlier cycle: check its test processes (`ps -o pid,etime,stat`). Long elapsed time with near-zero CPU is hung. Kill only that worktree's test processes and let the maker re-run.
 - Heartbeat `step: Make` when Make starts (`Fix r<N>` when Check fed it) and after every commit (`references/tracker.md` § Step).
 - 3 failed implement/test attempts on the same unit → `set_req_status` stopped, stop the heartbeat loop (`references/tracker.md` § Heartbeat loop), Keep as `blocked`. Do not grind.
 - When a coherent slice is green, commit it (`references/commits.md`). Do not hold the unit until Ship.

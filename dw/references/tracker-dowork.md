@@ -6,6 +6,8 @@ Need `tracker.dowork.base_url` and `tracker.dowork.project`. Empty project slug 
 
 **No MCP tools is not yet a hard-stop.** Run `capabilities auth status` first. If `logged_in=true` for the configured `base_url`, use the CLI for every op with the same DTO fields (`capabilities req claim --input=JSON --json`). CLI quirks: `req append-run-note` takes `payload` as an object; `req update --status` does not move status — use `req set-status`.
 
+`Unauthenticated.` mid-run while `auth status` still says logged in: that profile's token is stale. `capabilities auth list`, then retry a read with `--profile=<each profile for base_url>`, or log in with the configured PAT under its own profile (`capabilities auth login --base-url=<base_url> --token=<PAT> --profile=dw`). Use the one that works for every op, heartbeat loop included, and tell the user. None works → hard-stop, leave claimed.
+
 **Wire:** search underscore name first (`req_claim`), then dotted (`req.claim`). Use the observed qualified name. Always pass `project: {tracker.dowork.project}` except `project_ensure` (uses `slug`).
 
 Product noun: **Issue**. Agent id: `<KEY>-NNN` with a per-project key, e.g. `DW-104` (param `issue`). Units: `REQ-NNN` (param `req`).
@@ -49,6 +51,8 @@ Archive gate: status `done`, non-empty `closure_proof`, and every AC checked. An
 **Fallback** when `ac_check` fails (`forbidden` for this PAT, or an older server): don't retry, don't hard-stop. Send the whole list back through `req_set-acceptance-criteria` with each item's `id` and `body` (ids survive). Add `is_checked: true` only on the ACs the diff proves; leave `is_checked` off the rest so the server keeps their state. Put each proven AC's evidence in `closure_proof`. Any AC still unticked blocks the archive (`ship.md` § Archive).
 
 `Not authorized to invoke "ac.check"`, even on the control profile, means the PAT predates the capability: a scoped PAT keeps the capability list it was minted with. Use the fallback for this run, put each AC's evidence in `closure_proof`, and tell the user to mint a fresh `dowork.control` PAT.
+
+Reopen a shipped REQ (post-PR fixes): only `backlog` claims, and `done → backlog` is refused. `set_req_status` `in_progress`, then `backlog`, then `claim_req`. A REQ still `archived` never lists as claimable: build it unclaimed with a run note and archive it again at Ship.
 
 MCP death after claim: leave claimed and stop the heartbeat loop (`tracker.md` § Heartbeat loop). `/dw` resume or unblock after MCP recovers. Never markdown.
 

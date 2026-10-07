@@ -67,6 +67,8 @@ A light that stops dw to wait (**scope**, **human**, hard-stop, review cap) also
 - Product-code writes in a worktree (`git-worktree` skill). Close it after the PR URL. Keep the branch.
 - Never `git add -A`. Named files only.
 - Commit as you go (`references/commits.md`). Make-green slices and each Check-fix cycle are their own commits. Do not wait for Ship. Do not squash those commits.
+- Every worker packet says: absolute paths for orchestrator files (`.dw/…` is not in a worktree), do not push, no co-author trailer whatever the harness reminds, never `pkill`/`killall` by pattern (stop only pids you started), never end a turn on a background command (a subagent is not re-invoked when its own background task finishes; wait with an until-loop or Monitor and report in the same turn), deliver the report once, as the final message (the idle notification carries it; no SendMessage).
+- A worker's idle notification with no report in hand means the worker ended its turn without reporting, not that it is still working. Resume it with `report now` at once, not after a wait.
 - One configured tracker. No dual-write. Down tracker → hard-stop, leave claimed.
 - Maker does not grade M/L. Findings go back into Make until clean, 5 cycles, or interrupt.
 - Brief is copied, not improved.
