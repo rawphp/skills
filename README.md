@@ -50,7 +50,6 @@ Publish for every hub-wired agent after a skill is finished:
 ```bash
 # Same as install.sh once clients symlink the hub
 ./<name>/install.sh
-# Or use the distribute-skill-to-all-agents skill from an agent session
 ```
 
 Verify:
@@ -74,94 +73,26 @@ my-skill/
 
 Frontmatter `name` must match the folder name. The `description` is the routing contract (what + when + differentiator) — agents only see that until the skill loads.
 
-Authoring guide: [`effective-agent-skills`](./effective-agent-skills/SKILL.md).  
 Installer template: [`skills-hub/references/install-template.sh`](./skills-hub/references/install-template.sh).
 
 ## What’s in here
 
-~250 skills across product, engineering, GTM, content, and agent ops. Highlights by area:
-
-### Agent platform & meta
-
-Hub wiring, multi-agent orchestration, skill craft, session workflow.
-
 | Skill | Purpose |
 |-------|---------|
-| [`skills-hub`](./skills-hub/SKILL.md) | Source / hub / client layout and install |
-| [`distribute-skill-to-all-agents`](./distribute-skill-to-all-agents/SKILL.md) | Publish a finished skill to the hub |
-| [`effective-agent-skills`](./effective-agent-skills/SKILL.md) | How to write skills well |
-| [`delegating-to-agents`](./delegating-to-agents/SKILL.md) | Hand work to Pi / Codex / Claude / Hermes |
-| [`cmux`](./cmux/SKILL.md) | cmux workspaces, panes, agent surfaces |
+| [`skills-hub`](./skills-hub/SKILL.md) | Source / hub / client layout, install, import from GitHub |
 | [`dw`](./dw/SKILL.md) | Dark-factory work loop: brief → worktree → TDD → review → PR |
-| [`fable-mode`](./fable-mode/SKILL.md) | Multi-gate discipline for hard / multi-layer work |
-| [`goal-loop`](./goal-loop/SKILL.md) | Long-running plan → act → test → review loops |
-| [`handoff`](./handoff/SKILL.md) | End-of-session handoff for a fresh agent |
-| [`global-agent-guardrails`](./global-agent-guardrails/SKILL.md) | Shared denylist of catastrophic shell commands |
-| [`skill-optimizer`](./skill-optimizer/SKILL.md) | Eval-driven skill improvement loop |
-| [`skill-seekers`](./skill-seekers/SKILL.md) | Generate skills from docs, repos, PDFs, video |
-
-Also: `agent-self-scheduling`, `codex-subagent`, `creative-collision`, `ideate`, `party-mode`, `tournament`, `dw-brief`, `dw-work`, `dw-init`, `prompt-me`, `setup-help`, `teach`, `level-up`, `short`, `remind`, and others under matching folder names.
-
-### Engineering & architecture
-
-| Skill | Purpose |
-|-------|---------|
-| [`software-architecture`](./software-architecture/SKILL.md) | Clean Architecture / DDD / SOLID design rules |
-| [`architecture-analyst`](./architecture-analyst/SKILL.md) | Laravel + SPA best-practices audit |
-| [`intended-vs-implemented`](./intended-vs-implemented/SKILL.md) | Intent vs code gap analysis |
-| [`ease-of-change`](./ease-of-change/SKILL.md) | PEI / hotspot change-cost scorecard |
-| [`data-quality-loop`](./data-quality-loop/SKILL.md) | Fix prod data bugs at the write path |
-| [`log-coverage-loop`](./log-coverage-loop/SKILL.md) | Instrument important paths until logs are useful |
-| [`shipping-artifacts`](./shipping-artifacts/SKILL.md) | Docs that make AI-built apps reviewable |
-| [`launch-readiness-audit`](./launch-readiness-audit/SKILL.md) | Pre-launch issue register (find, don’t fix) |
-| [`forge-inspect`](./forge-inspect/SKILL.md) | Read-only Laravel Forge prod logs / config |
-| [`docs-sync`](./docs-sync/SKILL.md) | Bring docs in line with the implementation |
-| [`brain-to-docs`](./brain-to-docs/SKILL.md) | Interview loop → README + ADRs |
-| [`browser-harness`](./browser-harness/SKILL.md) | Direct CDP control of the user’s Chrome |
-| [`create-readonly-db-role`](./create-readonly-db-role/SKILL.md) | Hardened SELECT-only Postgres for agents |
-
-Also: `arch-viz`, `code-structure`, `kaizen`, `github-actions`, `ios-simulator`, `onboarding-friction-loop`, `test-scenarios`, `sql-queries`, `google-safe-browsing`, `cyber-audit`, and related folders.
-
-### Product discovery & strategy
-
-PRDs, JTBD, prioritization, canvases, interviews, metrics, experiments.
-
-Examples: `create-prd`, `opportunity-solution-tree`, `job-stories`, `user-stories`, `wwas`, `user-personas`, `ideal-customer-profile`, `brainstorm-*`, `identify-assumptions-*`, `prioritize-*`, `pre-mortem`, `strategy-red-team`, `product-strategy`, `product-vision`, `lean-canvas`, `startup-canvas`, `business-model`, `north-star-metric`, `metrics-dashboard`, `ab-test-analysis`, `cohort-analysis`, `swot-analysis`, `porters-five-forces`, `pestle-analysis`, `sprint-plan`, `retro`, `interview-script`, `summarize-interview`, `summarize-meeting`.
-
-### GTM, marketing & sales
-
-Examples: `gtm-strategy`, `gtm-motions`, `gtm-skills`, `growth-loops`, `competitor-analysis`, `competitive-battlecard`, `positioning-ideas`, `landing-page-designer`, `email-marketer`, `marketing-ideas`, `promo-graphic-prompter`, `domain-namer`, `lead-research-assistant`.
-
-### Content & writing
-
-Examples: `author`, `editor`, `script-studio`, `ai-avatar-script`, `content-engine`, `content-research-writer`, `humanize`, `my-voice`, `grammar-check`, `changelog-generator`, `release-notes`, `cover-renderer`, `markdown-to-html`, `article-extractor`, `youtube-transcript`.
-
-### Research & external tools
-
-| Skill | Purpose |
-|-------|---------|
-| [`deep-research`](./deep-research/SKILL.md) | Sourced research reports, fact-check ledgers, decision cards |
-| [`defuddle`](./defuddle/SKILL.md) | Clean markdown from web pages |
-| [`researcher`](./researcher/SKILL.md) | Product teardown → BUILD / CONSIDER / SKIP |
-| [`storm-research`](./storm-research/SKILL.md) | Multi-lens STORM HTML briefings (explicit trigger only) |
-
-Also: `reddit-fetch`, `research-prompt`, `obsidian-cli`, `obsidian-markdown`.
-
-### Ops & personal tooling
-
-Examples: `vps-server-management`, `xero-copilot`, `file-organizer`, `anti-sleep`, `dummy-dataset`, `draft-nda`, `privacy-policy`, `review-resume`, `building-blog`.
-
-### Bundles
-
-| Path | Notes |
-|------|--------|
-| `career-helper/` | Career-helper plugin bundle (skills nested inside) |
-| `marketing-skills/` | Marketing skill pack / plugin tree |
-| `solo-skills/` | Solo-operator skill pack |
+| [`factory-issue`](./factory-issue/SKILL.md) | File GitHub or Linear issues the software factory can build |
+| [`code-review`](./code-review/SKILL.md) | Maintainability review of a branch or PR (light / medium / deep) |
+| [`release-safe`](./release-safe/SKILL.md) | Release gate for breaking changes and client-visible risk |
+| [`branch-ship-loop`](./branch-ship-loop/SKILL.md) | Loop code-review and release-safe until a branch is ship-ready |
+| [`devils-advocate-loop`](./devils-advocate-loop/SKILL.md) | Multi-round critic ↔ builder loop on a design or rollout plan |
+| [`product-demo-record`](./product-demo-record/SKILL.md) | Record a live product walkthrough as a screen tape |
+| [`product-intro-video`](./product-intro-video/SKILL.md) | Narrated product intro video with voice-over, captions, music |
+| [`pr-brief-video`](./pr-brief-video/SKILL.md) | Two-minute reviewer brief video for one pull request |
 
 ## Create a new skill
 
-1. Copy structure from a small existing skill or scaffold via `effective-agent-skills`.
+1. Copy structure from a small existing skill.
 2. Folder name = `name` in `SKILL.md` frontmatter (lowercase, hyphens).
 3. Write description first (what / when / differentiator + trigger phrases).
 4. Keep `SKILL.md` lean; push detail to `references/` and logic to `scripts/`.
@@ -184,5 +115,4 @@ chmod +x my-skill/install.sh
 ## Related docs
 
 - Hub skill: [`skills-hub/SKILL.md`](./skills-hub/SKILL.md)
-- Authoring: [`effective-agent-skills/SKILL.md`](./effective-agent-skills/SKILL.md)
-- Agent health / hub wiring check: [`agent-doctor/SKILL.md`](./agent-doctor/SKILL.md)
+- Import from GitHub: [`skills-hub/references/import-from-github.md`](./skills-hub/references/import-from-github.md)
