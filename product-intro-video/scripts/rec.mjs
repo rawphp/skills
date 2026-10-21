@@ -8,8 +8,10 @@ import path from 'node:path';
 import { execSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
-export const LEAD = 0.6;   // VO starts this far into a scene
-const TAIL = 0.8;          // hold after the VO ends
+// video.json `pace` {lead, tail} tightens or loosens the gaps between lines; build.mjs reads the same keys.
+const PACE = (() => { try { return JSON.parse(fs.readFileSync('video.json')).pace || {}; } catch { return {}; } })();
+export const LEAD = PACE.lead ?? 0.6;   // VO starts this far into a scene
+const TAIL = PACE.tail ?? 0.8;          // hold after the VO ends
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = () => Date.now() / 1000;
 const ease = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);

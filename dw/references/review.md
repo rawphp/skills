@@ -30,6 +30,8 @@ Each selected file in `references/reviewers/<name>.md` is the whole prompt plus:
 - Contract `done` / `out` / `settled`
 - Output shape below
 
+PR on a base other than the integration branch: `git log <base>..origin/<integration> --oneline`. Non-empty → give those commits to every persona, and have `correctness` judge the merged tree (`git merge-tree --write-tree`), not only the diff.
+
 One concurrent batch of host parallel subagents. Checker model from `references/models.md`.
 
 Maker session does not play a persona.
@@ -37,6 +39,8 @@ Maker session does not play a persona.
 One worktree → at most **one** reviewer (usually `testing`) may edit files; it restores with `git checkout` and ends on a clean `git status`. Every other persona is strictly read-only (read `git show HEAD:<path>` if code looks changed). After cycle 1, drop the read-only reviewers and keep the mutating one; its re-check is "re-run your surviving mutants." A blocker from `security` or `adversarial` whose fix adds code brings that persona back for the next cycle, until it approves. L unit: the last wave before Ship includes one `correctness` reviewer on the whole unit diff at the tip (`<base>..HEAD`), earlier findings marked known. If the maker model changes, keep at least one reviewer on a different model.
 
 Parallel workers never share a mutable resource. A persona that runs tests does it in its own copy (`git worktree add --detach <scratch> <unit tip>`, never `HEAD` from the primary) with its own test resources (DB name, ports, caches: `<unit>_<persona>`). The orchestrator's own runs follow the same rule. A gate run that overlapped another process on the same tree or resource does not count: re-run it alone on the clean tip before push.
+
+On a re-run or resume, `git -C <scratch> diff` before dispatch: a killed mutating persona can leave a mutant applied. Restore it, and reuse the reports already in `.dw/review/`.
 
 ## Merge
 

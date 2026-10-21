@@ -19,6 +19,7 @@ Read when writing `video.json`, `script.json`, `scenes.mjs` or `cards.js`. Start
 | `app.localStorage` | Keys set before load to dismiss splashes and tours (use the exact value the app checks, often `"true"`) |
 | `app.locale`, `app.timezone` | Optional, e.g. `"en-GB"`, `"Europe/London"`. Match the audience so dates and money read right. Default: this machine's |
 | `reset` | `{cmd, cwd, before: [ids]}` runs once before recording any listed scene (and after a dry run of one). Scenes that write data must be listed |
+| `pace` | Optional `{lead, tail}` in seconds: the hold before each line's voice (default 0.6) and after it (footage 0.8, cards 0.9). `{lead: 0.35, tail: 0.35}` suits a high-energy video. Re-record footage after changing it |
 | `voice` | ElevenLabs `id`, `model`, `stability`, `similarity`, `style`, `speed` |
 | `captions.replace` | Spoken phrase → written form, e.g. `"R and D": "R&D"` |
 | `brand` | CSS colours: `primary` (title/end background), `accent`, `accent2`, `highlight` (rings, pill), `ink` |
@@ -71,7 +72,7 @@ export default {
 | `await r.cam(target, {zoom = 2, pad = 1.35, dur = 0.9, dx, dy})` | Zoom to fit a locator or `{x, y, width, height}` in viewport CSS px |
 | `r.camOut(dur)` | Back to the full screen |
 | `await r.ring(target, {dur, pad})` | Yellow highlight box around a target (follows the camera) |
-| `r.sticker(text, {x, y, rot, size, dur, sfx})` | Sticky-note joke in screen px (1920×1080). An emoji-only text renders bare |
+| `r.sticker(text, {x, y, rot, size, dur, sfx})` | Sticky-note joke in screen px (1920×1080). Text that starts with an emoji renders as a bare emoji with the rest invisible, so put an emoji at the end |
 | `r.sfx(name, vol)` | Play a sound now (`bonk`, `chime`, a custom one) |
 | `await r.scrollBy(locator, dy, dur)`, `await r.ensureVisible(locator, {top})` | Smooth scroll of the element's scroll container |
 | `await r.rect(locator)`, `await r.wait(s)` | Bounding box, plain wait |
@@ -84,14 +85,15 @@ After a click that navigates or changes state, wait for the new state (`await x.
 - Zoom in on the thing the voice names, zoom out before a navigation or a scroll, and give each zoom about 0.9 s.
 - A ring is for "look here" on text or a button. Keep it to about 2–3 s.
 - Keep stickers clear of the caption strip (bottom 140 px) and of whatever the camera is showing.
+- To fix a sticker in a recorded scene, edit `footage/<id>/meta.json` `stickers[].text` and rebuild. No retake.
 
 ## Custom cards (cards.js)
 
 When no built-in template fits, add `cards.js` to the project folder. `render.mjs` loads it into the compositor before the first frame. Register each template with `addCard(name, {css, build, draw})`:
 
-- `css` styles the card. Scope it under `.t-<name>` and give that root a background; the crossfade into the next scene reads it.
+- `css` styles the card. Scope it under `.t-<name>` and give that root a solid background colour, under any gradient (`radial-gradient(...) #0b1020`). The crossfade into the next scene reads it, and a gradient alone reads as transparent, so the fade flashes light grey. The compositor styles some class names globally (`.item`, `.big`, `.pill`, `.sub`, `.line`, `.note`, `.aside`, `.eyebrow`), and they apply inside `.t-<name>` too. Prefix your own class names or override every inherited property.
 - `build(card)` returns the card's HTML once. Escape text with `esc()`.
-- `draw(el, card, lt, scene)` runs every frame with `lt`, the seconds since the scene started. Set styles from `lt` only (no timers or CSS transitions), so any frame renders the same on its own.
+- `draw(el, card, lt, scene)` runs every frame with `lt`, the seconds since the scene started. Set styles from `lt` only (no timers or CSS transitions), so any frame renders the same on its own. Draw the card's frame (box, rail, strip) by 0.2–0.4 s and cue only the content to words; a card whose first element waits for a word 3 s in sits blank that long. Check each scene's first still (start + 3 s).
 - Any field in the card that has an `at` gets a `t` in scene seconds, as in the built-in cards.
 - In scope: `esc`, `prog(lt, t0, dur)` (0→1), `ease`, `easeOut`, `back` (overshoot), `isEmoji`, the brand variables (`--primary`, `--accent`, `--accent2`, `--highlight`, `--ink`) and the fonts Inter and Caveat. The frame is 1920×1080.
 
@@ -114,6 +116,6 @@ addCard('quote', {
 { "id": "s09", "vo": "One team lead put it best. We stopped chasing people.", "card": { "template": "quote", "text": "We stopped chasing people.", "who": { "text": "Team lead, demo data", "at": "stopped" } } }
 ```
 
-Preview a custom card with `render.mjs --at` before the full render.
+Run `node --check cards.js` as soon as it is written or generated, so a bracket slip doesn't surface minutes into a 4K render. It doesn't catch an undefined name, which throws a `ReferenceError` in the browser and aborts a whole `--at` batch, so render one still before the batch. Preview a custom card with `render.mjs --at` before the full render.
 
-A fully animated video needs no live app: when every `script.json` line has a `card`, skip `rec.mjs` and `reset`, and write one `addCard` per scene. Every `css` is injected globally, so class names that aren't under their own `.t-<name>` collide across scenes.
+A fully animated video needs no live app: when every `script.json` line has a `card`, skip `rec.mjs` and `reset`, and write one `addCard` per scene. Every `css` is injected globally, so class names that aren't under their own `.t-<name>` collide across scenes. Generate a shared base stylesheet per template too (`.t-${name}`): the compositor puts only `.t-<name>` on the card root, so a base scoped to any other class never matches and headings render as unstyled text. Cards have no sticker layer. A joke note is an element inside the card, popped from `lt` with `back()` and kept clear of the bottom 140 px.

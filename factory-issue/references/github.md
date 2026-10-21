@@ -1,12 +1,24 @@
 # GitHub Issues
 
-`OWNER/REPO` is the repo's `origin`. All commands use `gh`. When the factory has its own `gh` login on this machine (`gh_config_dir` in `~/.config/softfac/config.yml`), prefix with `GH_CONFIG_DIR=<that dir>` to file as that login.
+`OWNER/REPO` is the repo the watching factory names. All commands use `gh`. Pass `-R OWNER/REPO` on every call, read-only checks included: in a checkout with several remotes (a fork with `upstream`) a bare call can answer for the wrong repo and look clean. To act as the factory's own login, prefix `GH_CONFIG_DIR=<gh_config_dir>`. Do not export `GH_TOKEN` in a script that also sets `GH_CONFIG_DIR`, because `GH_TOKEN` wins.
 
 ## Who am I
 
 ```sh
 gh api user -q .login          # must be in factory.instructors of {repo}/.dw/config.yml
 ```
+
+## Labels
+
+Labels: `factory:proposed`, `factory:ready`, `factory:needs-info`, `factory:triage`, `factory:building`, `factory:pr-open`, `factory:stuck`. Only the first two are yours to set; the factory writes the rest.
+
+A watched repo can still lack them. Check before filing, or every create fails on the label:
+
+```sh
+gh label list -R OWNER/REPO --search factory --json name   # prints nothing, not [], when none match
+```
+
+Create any missing ones with the colours in the factory's add-a-repo guide (`factory/site/guide/add-a-repo.md` in t3code-factory), for example `gh label create factory:proposed -R OWNER/REPO --color c5def5`.
 
 ## Create
 
@@ -16,20 +28,32 @@ Write the body to a file first; it keeps headings and code fences intact.
 gh issue create -R OWNER/REPO --title "<outcome in one line>" --body-file body.md --label factory:proposed
 ```
 
-Labels: `factory:proposed`, `factory:ready`, `factory:needs-info`, `factory:triage`, `factory:building`, `factory:pr-open`, `factory:stuck`. Only the first two are yours to set; the factory writes the rest. A repo missing them is not set up for the factory.
-
 ## Link a dependency (blocked by)
 
-GitHub dependency relationships are what the factory reads. The REST call takes the blocker's **node id**, not its number.
+GitHub dependency relationships are what the factory reads first. The REST call takes the blocker's **node id**, not its number, and needs `-F`: `-f` sends the id as a string and the call returns 422.
 
 ```sh
 BLOCKER_ID=$(gh api repos/OWNER/REPO/issues/<blocker> --jq .id)
 gh api -X POST repos/OWNER/REPO/issues/<dependant>/dependencies/blocked_by -F issue_id=$BLOCKER_ID
 ```
 
-A blocker in another repo works the same way with that repo's path in the first line.
+The POST echoes the dependant's number, not the blocker's, so its output does not confirm the link; Verify does. A blocker in another repo works the same way with that repo's path in the first line.
 
 In the web UI: issue sidebar → Relationships → "Mark as blocked by".
+
+To remove a link: the machine's dangerous-command guard blocks a `DELETE` through `gh api`. Do the rest of the edit, then give the user this line to run with `!`, or point at the sidebar's Relationships. The issue can sit at `factory:ready` meanwhile, since a link only holds the claim back.
+
+```sh
+gh api -X DELETE repos/OWNER/REPO/issues/<dependant>/dependencies/blocked_by/<blocker id>
+```
+
+## Sub-issues (parent and children)
+
+```sh
+gh api -X POST repos/OWNER/REPO/issues/<parent>/sub_issues -F sub_issue_id=<child .id>
+```
+
+The parent gets no `factory:*` label: a proposed parent gets bulk-flipped to ready and goes stuck. No child names the parent under `## Depends on`. Verify with `subIssues(first:N){ nodes{ number } }` on the parent.
 
 ## Verify
 
@@ -38,7 +62,7 @@ gh api graphql -f query='query{ repository(owner:"OWNER",name:"REPO"){ issue(num
 gh issue view <n> -R OWNER/REPO --json labels --jq '[.labels[].name]'
 ```
 
-`blockedBy` must list every issue named under `## Depends on`. `state: OPEN` means the factory will print `<repo>#<n> ready: blocked by #<m>` each pass and claim nothing; `CLOSED` clears it.
+`blockedBy` must list every issue named under `## Depends on`. `state: OPEN` means the factory waits each pass and claims nothing; `CLOSED` clears it.
 
 ## Mark ready
 

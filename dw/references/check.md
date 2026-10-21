@@ -16,11 +16,15 @@ Run the contract `test:` command from the worktree. Red → Make (counts toward 
 
 A red in a file the diff does not touch: re-run it alone in the worktree, then alone at the base commit in the primary checkout. Put it on the receipt as base defect, worktree-only or flaky. It is not a Make strike and the unit does not edit that test, but do not call the gate green. A suite that fails at file load from the machine (disk full, file handles, missing install) is environment, not a strike: fix it or raise **human**, then re-run the whole suite.
 
+Before the first wave, confirm the CI test command collects every new test file: compare its test count at the base and at the tip, and put the delta in the `testing` packet.
+
+Background gate runs: address the tree by absolute path (`git -C`, `--manifest-path`, `--package-path`), log to `/tmp/<unit>-<gate>.log`, and read the log's test-count line, never the task's exit code. A dropped `cd` runs the gate in the primary checkout.
+
 **S mechanical:** green (or no tests needed, say why) → Ship. No roster.
 
 ## 2. Review (M/L)
 
-Load `references/review.md`. Dispatch the native roster on the unit diff. Maker does not play a persona. Checker model: `references/models.md`. Heartbeat `step: Check r<N>` as wave N goes out.
+Tip check first (`references/make.md`). Load `references/review.md`. Dispatch the native roster on the unit diff. Maker does not play a persona. Checker model: `references/models.md`. Heartbeat `step: Check r<N>` as wave N goes out.
 
 UI unit: screenshot the running worktree before the first wave (confirm the server's cwd is this worktree). Visual findings go to Make with cycle 1's.
 

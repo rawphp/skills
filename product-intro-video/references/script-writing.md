@@ -20,7 +20,7 @@ There is no fixed shape. Build the scene list from the audience's job and what t
    - where the guides live: the `end` card
 3. Pick a template for each card. `grid` fills a window with files for "the old way", but it has been overused as an opener: build a fresh opener for each video in `cards.js`, from the feature's own villain, and offer it at the gate. `title` is a brand-colour name card. `stack` slides items in, which suits messages. When none of them fits, write your own in `cards.js` (see `references/api.md`).
 
-A feature tour often runs opener, title, 6–10 tasks, close. Use that only when it fits. A two-minute how-to can be all footage behind one title card, and a launch video can lean on cards.
+A feature tour often runs opener, title, 6–10 tasks, close. Use that only when it fits. A two-minute how-to can be all footage behind one title card, and a launch video can lean on cards. A long video that will be cut into shorts gets a title card with a spoken chapter name at the start of every chapter, so each chapter opens on a hook and can be clipped there.
 
 **Validation videos.** When the video exists to check a build against its rules, give each rule a number at the script gate. Show it as a square chip (`r.sticker`, rot 0, one fixed corner) when it is spoken, and keep tilted stickers for jokes. Chips at a fixed spot overlap when a second lands within the first's `dur`, so use one `rule()` helper in `scenes.mjs` that tracks when the last chip ends and drops the next a row lower. Drive each access rule as the persona it is about (sign in per scene in `setup`), not as one all-seeing demo account. After the render, write `rules.md` beside the mp4: rule, chip time (from `timeline.json` stickers), persona and screen, the source line, the code that owns it, and **Shown** or **Stated**, so reviewers know which rules the screen proves and which only the voice claims.
 
@@ -72,6 +72,16 @@ Rules for every tone:
 - Spell out what TTS mangles ("R and D", "control C", "version two"), then map it back for captions with `captions.replace` in `video.json`.
 - Plant a distinct cue word where each on-screen action should land ("Press **Start**", "until you **push**"). Repeated words are fine; scenes pick the nth one with `r.at(word, n)`.
 - Give actions about a second. A click needs ~0.6 s of cursor travel before its word, and typing a sentence takes 1–1.5 s.
+
+### Non-Latin voice-over
+
+Word cues (`at: "word"`) and the built-in captions match only `[a-z0-9-]`, so they don't work for Thai or other non-Latin scripts. Write the script as segments of `[voice line, caption]`:
+
+- Join the voice lines with spaces for `vo`. `tts.py` splits words on whitespace, so the token count per segment maps each segment to its word timings.
+- Resolve every cue to numeric seconds yourself: the word's start plus the lead (0.6 s, or `pace.lead`).
+- After `build.mjs`, overwrite `timeline.json` `captions` with one caption per segment, and set `#cap` to `white-space: normal` in `cards.js` so long captions wrap.
+- Check the languages in `/v1/models` before choosing a model. For Thai, only `eleven_v3` and `eleven_v4` work.
+- Round-trip every clip through `/v1/speech-to-text` (`scribe_v1`) and diff it against the script. Names written back in Latin script are fine. A garbled brand name is not: when regenerating doesn't fix it, add context to the voice line (the word for "company" before the name).
 
 ## Approval gate
 

@@ -15,7 +15,7 @@ Default work loop. Dark: act unattended. Light: only for risk.
 
 Always read `references/field-lessons.md` before acting if it has lessons.
 
-Load config from `{repo}/.dw/config.yml`, else `{repo}/.do-work/config.yml`. Missing `tracker.backend` (`do-work-io` or `linear`) → hard-stop: `/dw-init`. Write new keys only to `.dw/config.yml`.
+Load config from `{repo}/.dw/config.yml`, else `{repo}/.do-work/config.yml`. Missing `tracker.backend` (`do-work-io` or `linear`) → hard-stop: `/dw-init`, unless the config holds a `factory:` block (`references/isolate.md` § Factory repo). Write new keys only to `.dw/config.yml`.
 
 **Split commands (preferred):** `/dw-brief` creates the workset. `/dw-work` runs isolate → make → check → ship (PR). `/dw` with a raw brief does brief then work. `/dw` with a slug is work only.
 

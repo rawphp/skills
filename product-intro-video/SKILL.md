@@ -21,6 +21,8 @@ SK="<this skill's directory>/scripts"
 npm install --prefix "$SK"            # only if check.sh says playwright is missing
 ```
 
+If python-libs says MISS because `python3` is a release Pillow has no wheel for yet (3.15 in late 2026), run `mix.py`, `qa.py`, `tts.py` and `sfx.py` with the newest `python3.x` that imports PIL and numpy instead.
+
 If the ElevenLabs line says MISS, stop and ask the user for a key (`export ELEVEN_LABS_API_KEY=...`). Don't brief or walk without one. Note the tier and characters left for the approval gate. The free tier needs attribution and excludes commercial use, so tell the user now if the video is for customers or marketing.
 
 Check free disk too: `df -h` on the project volume and `du -sh` the sibling video folders' `footage/ render/ mix/`. `check.sh` doesn't look at free space, and 4K footage from earlier runs ends a run with `ENOSPC`. Under ~10 GB free, ask the user to clear an approved run's intermediates before briefing.
@@ -44,7 +46,7 @@ A second video for the same product starts from the first one's folder: copy its
 
 **2. Walk before you write.** Dry-walk the audience's screens as the persona: headless screenshots, or `node "$SK/rec.mjs" --dry <id>` once scenes exist. Note the real states, messages and demo names. The story, and any jokes, come from these.
 
-**3. Script.** Read `references/script-writing.md`. Build the scene list from the audience's tasks: each scene gets a visual and a voice line, and a card only where the screen can't make the point. **Gate:** show it with its estimated length against any target and its ElevenLabs cost, and ask about tone (straight, light or comedic), narrator voice and music bed before spending credits. If the source runs out short of the target, say so here rather than padding. Then write `script.json` and `video.json`, and `cards.js` if a card needs its own template (`references/api.md`).
+**3. Script.** Read `references/script-writing.md`. Build the scene list from the audience's tasks: each scene gets a visual and a voice line, and a card only where the screen can't make the point. **Gate:** show it with its estimated length against any target and its ElevenLabs cost, and ask about tone (straight, light or comedic), narrator voice and music bed before spending credits. If the source runs out short of the target, say so here rather than padding. Then write `script.json` and `video.json`, and `cards.js` if a card needs its own template (`references/api.md`). For tc-video house style in cards, read `references/tcv-cards.md`.
 
 **4. Audio.**
 ```bash
@@ -69,7 +71,7 @@ node "$SK/rec.mjs"                    # all footage scenes; or: node "$SK/rec.mj
 node "$SK/build.mjs"                  # timeline.json; prints the total and each scene's start and length
 node "$SK/render.mjs" --at 5,20.5,47  # preview/t*.jpg: look at cards, zooms, rings, stickers (loads cards.js)
 ```
-Pick preview times from the build output (a zoom's cue plus 1 s). Fix, then re-record the scene or edit the card, and preview again.
+Pick preview times from the build output (a zoom's cue plus 1 s). Fix, then re-record the scene or edit the card, and preview again. With more than about a dozen stills, tile them into 2×3 contact sheets with Pillow (960×540 tiles; two columns of three rows need a 1920×1620 canvas, or the third row is cropped) and read those instead. Sort the files with `float(os.path.splitext(name)[0][1:])`; a regex fails on names like `t13.5.jpg`.
 
 **8. Render, mix, QA.**
 ```bash
@@ -78,6 +80,8 @@ python3 "$SK/mix.py"                  # voice -16 LUFS, ducked music, effects; m
 python3 "$SK/qa.py"                   # flashes, hard cuts, loudness, qa/sheet.jpg
 ```
 Read `qa/sheet.jpg`. You're done when there are no flashes, the loudness is about -16 LUFS, and every sheet frame shows the intended state.
+
+The engine renders 16:9 only. For a 9:16 social cut, don't re-render: in ffmpeg, scale the final video to 1080 wide, centre it on a solid brand-colour 1080×1920 `color` source, and overlay a Pillow-made headline PNG above it and the link below. Don't use a blurred copy of the video as the background: light scenes turn it pale and white text disappears.
 
 **9. Leave it clean.** Run the reset command again after the last take. Stop any servers you started.
 
@@ -96,7 +100,7 @@ Report:
 - the reset run and servers stopped
 - how to retake a scene: `rec.mjs <id>`, then build, render and mix
 
-For a YouTube upload, hand off to `youtube-package` (thumbnails, titles, description with chapters).
+For a YouTube upload, hand off to `youtube-package` (thumbnails, titles, description with chapters). For spoken feedback from the audience, hand off to `watchalong`: it reads this folder's `script.json`, `timeline.json`, `video.json` and the mp4.
 
 ## Stop
 

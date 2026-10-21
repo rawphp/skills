@@ -11,7 +11,7 @@ A reviewer watches this before reading the diff. It says what the PR changes, wh
 
 ## Inputs
 
-- The PR URL. `gh` uses the account already logged in for that host.
+- The PR URL. `gh` uses the account already logged in for that host. When `gh` says it could not resolve a private repo, the repo may belong to another logged-in account: `GH_TOKEN=$(gh auth token --user <login>) gh pr view …`.
 - The review on the PR (a `/dw review` comment or the body's Review section) and the gate numbers on the tip. If there is no review yet, say so and run one first; the video states the review outcome and must not invent it.
 - ElevenLabs key: `"$PIV/check.sh"` prints the tier and characters left. Stop without one. The key stays in `ELEVEN_LABS_API_KEY`.
 
@@ -19,7 +19,7 @@ A reviewer watches this before reading the diff. It says what the PR changes, wh
 
 **1. Read the PR.** `gh pr view N --json title,body,headRefName,baseRefName,headRefOid,comments` and `gh pr diff N --stat`. Note the stack position (what merges before and after), each change area, the review counts (personas, cycles, fixes, blockers), the gate numbers, and anything the body leaves to a deploy check or outside the PR. Open the two or three files a reviewer should read first and copy the exact lines a code card will show.
 
-**2. Project folder.** `output/product-demo/pr<N>-summary/` in the repo (confirm it is gitignored). Start from the previous PR brief in the same repo when one exists: copy its `cards.js`, `audio/sfx/`, `speedup.py` and `video.json`, so the voice, pace, brand and caption map carry over and no sfx credits are spent. Otherwise copy `templates/*` and `scripts/speedup.py` from this skill and set the brand colours. The template voice is ElevenLabs' public voice Charlie (`IKne3meq5aSn9XLyUdCD`). Replace `voice.id` when this repo already has a voice.
+**2. Project folder.** `output/product-demo/pr<N>-summary/` in the repo (confirm it is gitignored). Start from the previous PR brief in the same repo when one exists: copy its `cards.js`, `audio/sfx/`, `speedup.py` and `video.json`, so the voice, pace, brand and caption map carry over and no sfx credits are spent. Otherwise copy `templates/*` and `scripts/speedup.py` from this skill and set the brand colours. The templates carry no `audio/sfx/` and `mix.py` fails without it, so copy a set from an earlier video (`find ~/EA/projects -path '*audio/sfx'`) before spending credits. The template voice is ElevenLabs' public voice Charlie (`IKne3meq5aSn9XLyUdCD`). Replace `voice.id` when this repo already has a voice.
 
 **3. Script.** Write `script.json` with 6–9 card scenes. The shape that has worked:
 
@@ -33,7 +33,9 @@ A reviewer watches this before reading the diff. It says what the PR changes, wh
 | s08 | `look` — three files + symbols, review box, deploy box | Where to look, review outcome, deploy check or outside-this-PR |
 | end | `gates` — backend / frontend / infra numbers, note on merge order | 7 s |
 
-Voice rules: short sentences; spell what TTS mangles (`four eighty five`, `P K C E`, `L L M`, `four oh one`) and map them back in `captions.replace`; put a distinct cue word where each card element should land; a cue that appears earlier in the line fires early. Budget: 330 words ≈ 1:45, 425 words ≈ 2:20 at this pace. Every claim traces to the PR body, the review or the code you opened. `references/example-script.json` is a fictional pull request. Copy the card shape and the cue style. The story is fiction.
+Voice rules: short sentences; spell what TTS mangles (`four eighty five`, `P K C E`, `L L M`, `four oh one`) and map them back in `captions.replace`, and map only what changes, because an entry whose key and value differ only in case (`"api": "api"`) lowercases the caption; put a distinct cue word where each card element should land; a cue that appears earlier in the line fires early. Budget: 330 words ≈ 1:45, 425 words ≈ 2:20 at this pace. Every claim traces to the PR body, the review or the code you opened. `references/example-script.json` is a fictional pull request. Copy the card shape and the cue style. The story is fiction.
+
+Card text limits: a `code` heading over about 55 characters wraps into the first block, so write `File.php · Class::method()`, not the full path. A `look` path over about 38 characters runs into the symbol column, so drop a leading `Http/` or `src/`. A `flow` lane `sub` over about 30 characters wraps under a two-word title, so keep it to the route.
 
 ```bash
 python3 "$SK/cues.py"          # every cue resolves; word, char and length estimate for the gate
@@ -53,7 +55,7 @@ node "$PIV/build.mjs"          # prints each scene's start and length — page.h
 node "$PIV/render.mjs" --at <one time per card, its last cue + 1 s>
 python3 "$SK/sheet.py" && open preview/sheet.jpg   # or Read it
 ```
-Fix wraps and overflows in `script.json` or `cards.js` (see field lessons), re-preview the changed cards, then:
+Fix wraps and overflows in `script.json` or `cards.js` (card text limits are under Script), re-preview the changed cards, then:
 ```bash
 node "$PIV/render.mjs" && python3 "$PIV/mix.py" && python3 "$PIV/qa.py"
 ```

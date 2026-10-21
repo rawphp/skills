@@ -3,8 +3,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const LEAD = 0.6; const FPS = 30;
 const cfg = JSON.parse(fs.readFileSync('video.json'));
+const LEAD = cfg.pace?.lead ?? 0.6; const FPS = 30;
 const script = JSON.parse(fs.readFileSync('script.json'));
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9-]/g, '');
 const vo = (id) => JSON.parse(fs.readFileSync(`audio/${id}.json`));
@@ -57,7 +57,7 @@ for (const line of script) {
   let s;
   if (line.card) {
     const card = resolve(line.card);
-    s = { id, type: 'card', card, dur: LEAD + v.end + (card.hold ?? (card.scratch ? 1.1 : 0.9)) };
+    s = { id, type: 'card', card, dur: LEAD + v.end + (card.hold ?? (card.scratch ? 1.1 : (cfg.pace?.tail ?? 0.9))) };
     if (card.scratch) card.scratchT = s.dur - 0.75;
   } else {
     const metaPath = `footage/${id}/meta.json`;

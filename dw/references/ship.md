@@ -1,12 +1,12 @@
 # Ship
 
-Load at step 5 after Check is clean (or user interrupt **ship** with no unnamed blockers). Heartbeat `step: Ship`.
+Load at step 5 after Check is clean (or user interrupt **ship** with no unnamed blockers). Heartbeat `step: Ship`. Tip check first (`references/make.md`).
 
 ## Commit
 
 Make and Check already committed (`references/commits.md`). Ship only commits leftover named files (format, lockfile). If the tree is clean, skip commit and push.
 
-Never squash Make or Check commits. Never `git add -A` or `git add .`. Never co-author trailers.
+Never squash Make or Check commits. Never `git add -A` or `git add .`. Never co-author trailers. Never put `Generated with Claude Code` or a `claude.com/claude-code` link in the PR body. Strip it if a tool appended it.
 
 ## PR
 
@@ -19,7 +19,7 @@ gh pr create --body-file <receipt path>
 
 Receipt: `references/receipt.md`. Include tracker slugs, maker/checker, review cycles, leftovers.
 
-Existing PR for this branch: `gh pr edit` with the same body file, do not open a second.
+Existing PR for this branch: `gh pr edit` with the same body file, do not open a second. A PR you did not open (a factory or someone else's): push with `git push origin HEAD:refs/heads/<pr branch>` and append your receipt to its body as a new section (`Review fixes`). Never replace that body.
 
 No remote / `gh` missing: local commit only. Say so. Still `archive_req` if the unit is done.
 
