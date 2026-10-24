@@ -86,6 +86,7 @@ Installer template: [`skills-hub/references/install-template.sh`](./skills-hub/r
 | [`release-safe`](./release-safe/SKILL.md) | Release gate for breaking changes and client-visible risk |
 | [`branch-ship-loop`](./branch-ship-loop/SKILL.md) | Loop code-review and release-safe until a branch is ship-ready |
 | [`devils-advocate-loop`](./devils-advocate-loop/SKILL.md) | Multi-round critic ↔ builder loop on a design or rollout plan |
+| [`demo-video`](./demo-video/SKILL.md) | Narrated demo or phase-update video: plan, cut, and a focus-box gate |
 | [`product-demo-record`](./product-demo-record/SKILL.md) | Record a live product walkthrough as a screen tape |
 | [`product-intro-video`](./product-intro-video/SKILL.md) | Narrated product intro video with voice-over, captions, music |
 | [`pr-brief-video`](./pr-brief-video/SKILL.md) | Two-minute reviewer brief video for one pull request |
