@@ -91,3 +91,21 @@ Default: stage 6. A second pass reads every still with the cue beside it. A new 
 Symptom: the left side of the box looks fine, and a menu, icon, badge, or the last line sticks out of the right or the bottom.
 Cause: the check looked at the easy edge.
 Default: stage 6. Padding is about 6px on every side. Look at the right edge and the bottom edge before the box is called done.
+
+## 16. The stroke eats the padding
+
+Symptom: every box measures right in source pixels and still looks tight on the rendered still, about 3 px instead of 6.
+Cause: the compositor draws the ring's border inside the rect, so a 5 px stroke takes most of the padding.
+Default: before measuring, check where the engine draws the stroke. Draw it outside the rect (offset the ring by the stroke width) in the project's copy, then pad 6 source px.
+
+## 17. A grid read by eye is still a guess
+
+Symptom: rects read off a gridded, downscaled frame are 3 to 20 px off on one side, so boxes are loose on one edge and touching on the opposite one.
+Cause: the eye snaps to the nearest grid line or reads a faint border, shadow or card edge as the target edge.
+Default: measure edges from pixel profiles on the decoded frame at the ring's own source times (start, +0.3 s, end must agree). Read by eye only at 3× zoom or more, and only to confirm a profile.
+
+## 18. The recorded cursor hides the claim
+
+Symptom: the box is right and a claimed word sits under the walk's own cursor dot.
+Cause: the walk tool parked the cursor on the control it last touched, and it stays there for the rest of the stretch.
+Default: pick a stretch where the cursor is off the claimed words. If none exists in that walk, take the same live surface from another walk and say so in `VALIDATE.md`.

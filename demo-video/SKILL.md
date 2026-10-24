@@ -19,14 +19,13 @@ Read `references/field-lessons.md` before stage 1. Read `product-intro-video` `r
 
 ## Stage 1. Plan
 
-Write `PLAN.md` in the project folder before any audio or frames.
+Read `product-intro-video` `references/brief.md` and run it before anything else: ask the user once, with every default filled in. Then write `PLAN.md` in the project folder before any audio or frames.
 
-- Audience and what they already know. A product owner does not get a tour of the basics.
-- Job of the video in one sentence.
-- Length target. Walk footage scenes stay under 15s. Do not pad.
-- Tone: straight, light, or comedic. Jokes come from a real on-screen refusal or label. Never mock a person, a team, or a customer.
+- The brief: audience, takeaway, humour and tone words, hard no's, length, reference video, voice and music, claim strength. Mark each as the user's answer or the default.
+- Walk footage scenes stay under 15s. Do not pad.
+- Jokes come from a real on-screen refusal or label.
 - Engine: `product-intro-video`, copied into the project (`engine/`, `cards.js`). Do not edit the skill's own scripts.
-- Voice and music. If the user says "like the last video", reuse that voice id and that licensed bed. Do not pick a new one.
+- Voice and music come from the reference video when there is one: the same voice id and the same licensed bed.
 - Ordered scene list: cold open, title, then each walk as chapter card + footage, then close. Order is the viewer's job, not the filename.
 
 **Learn.** If the plan repeats a lesson already in `field-lessons.md`, do not add it again.
@@ -114,6 +113,9 @@ Pass only when every line below is true. A miss goes back to stage 4, not into a
    - The box contains the whole target (row and menu, card, field and adornment and helper).
    - No sibling sits inside the box. Padding is about 6px on every side, clamped so the box does not leave its card or dialog. Check the right edge and the bottom edge on purpose: a trailing icon, menu, badge, or wrapped line outside the box fails.
    - The sticker, if any, names that same target and does not cover a neighbour.
+   - The recorded cursor does not cover a claimed word.
+   - The sticker sits next to its box, not at a fixed corner of the frame.
+   - Padding is measured to the inner side of the stroke on the rendered still, not on the source rect.
 5. That ring is gone, or a different ring is up, by the next cue word. A box left over from the previous noun fails.
 6. Every claim is visible in the cropped frame. Nothing is taken from a chip that was cropped off.
 7. Say plainly that you have not listened. Levels are measured. Voice delivery needs a human ear.

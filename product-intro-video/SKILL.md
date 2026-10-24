@@ -31,12 +31,7 @@ The app must run locally with seeded demo data and a persona sign-in (dev bypass
 
 ## Workflow
 
-**1. Brief.** Infer what you can from the repo, then ask the user once for the rest:
-- the audience: who watches, and what they do in the product
-- the source material: help docs, guides, README, release notes, a spec or a URL. Every factual line in the script traces to it. If there is none, say so; the script then comes from the dry walk, and the user confirms each claim at the gate
-- the target length, if they have one ("90 seconds", "about 3 minutes"). Without one, make the shortest video that covers the tasks
-- the demo persona whose permissions match the audience
-- where the project folder goes (default `output/intro-video/<slug>/` in the product repo, gitignored)
+**1. Brief.** Read `references/brief.md` and run it: answer from the repo what the repo can, then ask the user once, with every default filled in, for audience, takeaway, humour, tone words, length, voice, music and the rest. Record the answers and the defaults used.
 
 ```bash
 mkdir -p "$DIR" && cp "<skill dir>/templates/"* "$DIR/" && cd "$DIR"

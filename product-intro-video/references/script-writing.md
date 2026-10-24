@@ -44,7 +44,7 @@ After `tts.py`, check again with real numbers: the line lengths it prints, plus 
 
 ## Tone
 
-The user picks one at the approval gate.
+The brief's humour level picks the row (`brief.md`): 0–2 straight, 3–6 light, 7–10 comedic.
 
 | Tone | Voice | Cards and stickers |
 |------|-------|--------------------|
@@ -85,7 +85,7 @@ Word cues (`at: "word"`) and the built-in captions match only `[a-z0-9-]`, so th
 
 ## Approval gate
 
-Show the user the scene list (visual + voice line per scene) and ask three things before spending anything: tone (straight, light or comedic), narrator voice and music bed. Offer 2–3 options for each with a recommendation.
+Show the user the scene list (visual + voice line per scene) with the brief's tone, narrator voice and music bed (`brief.md`). Ask only what the brief left open, offering 2–3 options with a recommendation.
 
 Show two numbers with it:
 
