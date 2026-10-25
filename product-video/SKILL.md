@@ -1,6 +1,6 @@
 ---
 name: product-video
-description: 'Produce a narrated product video of any type (build summary, spec approval, how-to guide, PR brief) from a spec, docs, recorded walks or a live app: one engine, one six-stage line, a preset per type. Use for product video, phase update, build summary, spec approval video, how-to video, PR brief video, demo video, walkthrough with voice-over. Differentiator: the engine and every stage tool live here; types are presets; validation is a geometry gate plus an independent second pass. Needs an ElevenLabs API key.'
+description: 'Produce a narrated product video of any type (build summary, spec approval, how-to guide, PR brief) from a spec, docs, recorded walks or a live app: one engine, one six-stage line, a preset per type. Use for product video, phase update, build summary, spec approval video, how-to video, PR brief video, demo video, walkthrough with voice-over. Differentiator: the engine and every stage tool live here; types are presets; validation is a geometry gate plus an independent second pass. Needs an ElevenLabs API key. Trigger phrases: phase video, phase update video, build summary video, spec approval video, how-to video, reviewer brief, PR video, demo video, product tour, narrated walkthrough, walkthrough with voice-over, "video from these walk recordings", package for YouTube, send as a watchalong.'
 ---
 
 # Product video

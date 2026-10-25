@@ -1,0 +1,24 @@
+product-video	make the phase 4 video
+product-video	build the phase 4 update video like the last ones
+product-video	video to get the phase 4 spec approved
+product-video	spec approval video for the bills spec
+product-video	a how-to video for suppliers on submitting a bill
+product-video	record a walkthrough of the queries queue with voice-over
+product-video	PR video for #280
+product-video	reviewer brief video for this PR
+product-video	summarise the build as a video for Will
+product-video	demo video of the new import
+product-video	product tour video of the supplier portal
+product-video	narrated walkthrough of the help centre
+product-video	make a video from these walk recordings
+product-video	turn the phase 3 walks into an update video
+product-video	video update for the product owner
+product-video	package the phase 3 video for YouTube with thumbnails and chapters
+product-video	send the phase 3 video as a watchalong to Will
+filmcraft	trim the first ten seconds off this screen recording and export 1080p
+filmcraft	join the intro, main and outro mp4s and add SRT captions
+product-video	cut the phase 4 walk recordings into the update video with voice-over
+video	avatar video for the launch with HeyGen
+video	a 30 second talking-head script for reels about the import
+product-video	an AI-narrated tour of the supplier portal from the help docs
+clips-explainer-video	a clips explainer stitching ten interviews about AI agents
