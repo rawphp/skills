@@ -26,4 +26,13 @@ EOF
 # a project folder that carries its own engine copy must be refused by check.sh, by name (check.sh can fail for other reasons)
 mkdir engine; out=$("$SK/check.sh" --project "$T" 2>&1 || true)
 if ! grep -q "MISS project" <<<"$out"; then echo "copied engine NOT refused"; exit 1; fi
+T2="$(mktemp -d)"; cp -R "$SK/fixtures/tape/." "$T2"; cd "$T2"
+$PY "$SK/cut.py" w1 >/dev/null
+$PY - <<'EOF'
+import json; m=json.load(open('footage/w1/meta.json')); r=m['rings'][0]['rect']
+assert abs(r['x']-294*1920/1440)<0.6 and abs(r['y']-(194-8)*1920/1440)<0.6, r   # source px -> output px, top crop
+assert len(m['frames'])>40 and m['src']==1
+print('cut ok')
+EOF
+$PY "$SK/snap.py" | grep -q "w1-0" && echo "snap ok"
 echo "smoke ok"
