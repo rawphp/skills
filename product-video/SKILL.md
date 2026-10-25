@@ -7,7 +7,7 @@ description: 'Produce a narrated product video of any type (build summary, spec 
 
 One skill for every narrated product video, from brief to published link. Formerly seven skills: demo-video, product-intro-video, product-demo-record, pr-brief-video, youtube-package, watchalong and video-production; a search for any of those names lands here.
 
-Read `references/field-lessons.md` before stage 1.
+Read `references/field-lessons.md` before stage 1 when it exists (it is a per-machine file, not in git).
 
 ## What this is
 

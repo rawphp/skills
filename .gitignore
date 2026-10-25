@@ -2,3 +2,5 @@
 .DS_Store
 .playwright-mcp/
 
+# field-lessons.md is a per-machine inbox that apply-field-lesson drains into the skill; never git add -f one
+**/field-lessons.md
