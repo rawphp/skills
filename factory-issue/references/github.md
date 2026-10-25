@@ -41,7 +41,7 @@ The POST echoes the dependant's number, not the blocker's, so its output does no
 
 In the web UI: issue sidebar → Relationships → "Mark as blocked by".
 
-To remove a link: the machine's dangerous-command guard blocks a `DELETE` through `gh api`. Do the rest of the edit, then give the user this line to run with `!`, or point at the sidebar's Relationships. The issue can sit at `factory:ready` meanwhile, since a link only holds the claim back.
+To remove a link: the machine's dangerous-command guard blocks a `DELETE` through `gh api`. The guard also matches the DELETE text inside an `echo`, so never print it from a script. Do the rest of the edit, then write this line in your reply for the user to run with `!`, or point at the sidebar's Relationships. The issue can sit at `factory:ready` meanwhile, since a link only holds the claim back.
 
 ```sh
 gh api -X DELETE repos/OWNER/REPO/issues/<dependant>/dependencies/blocked_by/<blocker id>

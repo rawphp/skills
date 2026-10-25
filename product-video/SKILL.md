@@ -69,7 +69,7 @@ One folder of inputs, read in the mode the preset's `footage` names.
    WALK_BASE=http://localhost:<port> WALK_OUT=<source dir> WALK_FIXTURE=<upload file> WALK_PROJECT=<frontend dir> \
    WALK_RESTORE='<restore command>' SK="$SK" node "$SK/walk/run.mjs" --restore [w1 w2 ...]
    ```
-   Re-record one walk when its cursor parks on a claim (field lesson 9).
+   When a walk's cursor parks on a claimed word, add a `glide` to empty space after the scroll and re-record only that walk, then delete its `cache/<walk>*` folders so `cut.py` decodes the new tape. When the recorder or its stack is gone, pick a stretch where the cursor is off the claimed words, or take the same surface from another walk and name it in `VALIDATE.md`.
 5. One row per clip in `PLAN.md`: file, length, what it shows, what it must not claim.
 
 The walk tool burns a caption chip into the bottom of each frame. `cuts.json` names it (`"chip": {"y": 847, "h": 36}`) and the recordings folder (`"source": "<dir>"`); `cut.py` crops every frame above the chip. The chip is not evidence: a fact that existed only in the chip is not spoken or ringed. If the walk says a control is sample data, the scene says so and cuts to the live surface.
@@ -138,7 +138,7 @@ Write `VALIDATE.md`: the gate numbers (rings, failures), each review round, the 
 
 ## Stage 7. Publish
 
-Only when the brief or the preset names a target. YouTube: `presets/publish/youtube.md` (thumbnails, titles, a description with chapters from `timeline.json`, upload answers, and the upload when asked). Watchalong: `presets/publish/watchalong.md` (checkpoints from `timeline.json`, the plan document, upload, publish). A PR brief's target is the PR body: the watch line in `presets/pr-brief/preset.md`. The link goes into `VALIDATE.md` under "Published" and into the report. Nothing is uploaded without the user's go. Other tools a stage can use (thumbnail art, intros, grading, research) are listed in `references/other-tools.md`; the line names the tool, it does not hand the video over.
+Only when the brief or the preset names a target. Before any upload, YouTube included, run the reading-time check in `presets/publish/watchalong.md` step 1: a first-time viewer rarely pauses. YouTube: `presets/publish/youtube.md` (thumbnails, titles, a description with chapters from `timeline.json`, upload answers, and the upload when asked). Watchalong: `presets/publish/watchalong.md` (checkpoints from `timeline.json`, the plan document, upload, publish). A PR brief's target is the PR body: the watch line in `presets/pr-brief/preset.md`. The link goes into `VALIDATE.md` under "Published" and into the report. Nothing is uploaded without the user's go. Other tools a stage can use (thumbnail art, intros, grading, research) are listed in `references/other-tools.md`; the line names the tool, it does not hand the video over.
 
 ## Learn
 
