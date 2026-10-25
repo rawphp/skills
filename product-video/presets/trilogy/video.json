@@ -1,0 +1,62 @@
+{
+  "_": "house preset: copy into the project and set output",
+  "pace": {
+    "lead": 0.35,
+    "tail": 0.45
+  },
+  "voice": {
+    "id": "ENV:ELEVEN_LABS_VOICE_ID",
+    "model": "eleven_multilingual_v2",
+    "stability": 0.42,
+    "similarity": 0.8,
+    "style": 0.35,
+    "speed": 1.04
+  },
+  "captions": {
+    "replace": {
+      "Phase three": "Phase 3",
+      "H C A": "HCA",
+      "one forty": "$140"
+    }
+  },
+  "brand": {
+    "primary": "#1e3452",
+    "accent": "#2f9e9c",
+    "accent2": "#64bcea",
+    "highlight": "#ffbd36",
+    "ink": "#16202e"
+  },
+  "music": {
+    "file": "music/life-of-riley.mp3",
+    "fileA": "music/local-forecast-elevator.mp3",
+    "from": "title",
+    "lufs": -25,
+    "build": 4
+  },
+  "sfx": {
+    "riser": [
+      "Short upbeat whoosh riser into a hit, energetic, clean, no music",
+      1.2
+    ],
+    "hit": [
+      "Punchy short drum hit with a bright cymbal accent, upbeat, single",
+      0.9
+    ],
+    "nope": [
+      "Short comedic game-show wrong-answer buzzer, soft and friendly, single",
+      0.8
+    ],
+    "stamp": [
+      "Rubber stamp thump on paper, single firm hit",
+      0.6
+    ],
+    "tick": [
+      "Single soft bright UI tick, crisp",
+      0.5
+    ]
+  },
+  "credits": [
+    "Voice: ElevenLabs",
+    "Music: \"Life of Riley\" and \"Local Forecast - Elevator\" by Kevin MacLeod (incompetech.com), CC BY 4.0"
+  ]
+}

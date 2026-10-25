@@ -4,7 +4,8 @@ dir="$(cd "$(dirname "$0")" && pwd)"; bad=0
 need() { if eval "$2" >/dev/null 2>&1; then echo "ok   $1"; else echo "MISS $1 — $3"; bad=1; fi; }
 need ffmpeg        "command -v ffmpeg && command -v ffprobe"          "brew install ffmpeg"
 need node          "command -v node"                                  "install Node 20+"
-need python-libs   "python3 -c 'import PIL, numpy'"                   "pip3 install pillow numpy"
+PY="${PY:-python3}"
+need python-libs   "$PY -c 'import PIL, numpy'"                       "set PY to a python3.x that imports PIL and numpy, or pip3 install pillow numpy"
 need chrome        "test -d '/Applications/Google Chrome.app' || command -v google-chrome || command -v google-chrome-stable" "install Google Chrome (Playwright uses channel chrome)"
 need playwright    "test -d '$dir/node_modules/playwright'"           "npm install --prefix '$dir'"
 # ElevenLabs voices and effects: the key must be set and accepted. Prints the tier and characters left.

@@ -1,0 +1,16 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1280px;height:720px;overflow:hidden;background:#0B0E17;font-family:Inter,system-ui,sans-serif;color:#fff}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:48px 48px}
+.vig{position:absolute;inset:0;background:radial-gradient(900px 600px at 50% 45%,transparent 45%,rgba(0,0,0,.7))}
+.brand{position:absolute;left:52px;top:44px;display:flex;align-items:center;gap:12px;font-size:28px;font-weight:900;letter-spacing:3px}
+.brand i{width:18px;height:18px;border-radius:5px;background:#FF3B30;box-shadow:0 0 18px #FF3B30}
+.brand span{color:#FF3B30}
+.mono{font-family:'SF Mono',ui-monospace,Menlo,monospace}
+.phone{position:absolute;border-radius:48px;background:#131826;border:4px solid #2A3350;box-shadow:0 40px 90px rgba(0,0,0,.7);overflow:hidden}
+.head{height:96px;background:#182033;display:flex;align-items:center;gap:14px;padding:26px 26px 0;font-size:26px;font-weight:800}
+.av{width:54px;height:54px;border-radius:50%;background:#243052;display:grid;place-items:center;font-size:32px}
+.b{position:absolute;padding:18px 24px;border-radius:26px;font-size:32px;font-weight:700;line-height:1.2}
+.me{background:#2F6BFF;border-bottom-right-radius:8px}
+.bot{background:#232B40;border-bottom-left-radius:8px}
+.stamp{position:absolute;font-weight:900;letter-spacing:3px;color:#FF3B30;border:9px solid #FF3B30;border-radius:16px;padding:8px 26px;text-transform:uppercase;background:rgba(11,14,23,.6);white-space:nowrap}
+.note{position:absolute;font-family:Caveat,cursive;font-weight:700;color:#1a1a1a;background:#FFE58F;padding:6px 22px 10px;border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.4);white-space:nowrap}

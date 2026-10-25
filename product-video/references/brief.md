@@ -1,6 +1,6 @@
 # The brief
 
-Read at the start of `product-intro-video` step 1 and `demo-video` stage 1. The brief is how the video captures the user's voice: what they want the viewer to take away, how funny it is, and how it sounds.
+Read at the start of stage 1 (Plan). The brief is how the video captures the user's voice: what they want the viewer to take away, how funny it is, and how it sounds.
 
 ## How to ask
 
@@ -29,7 +29,7 @@ The brief is done when every row below has a recorded value.
 | **Words to use or avoid, and spelling** | The product's own UI words. Spelling follows the repo's own English (AU, UK or US). |
 | **Budget**: ElevenLabs credits | Stop at the approval gate if the script needs more than half the credits left. |
 
-Live-app tours (`product-intro-video`) also ask:
+Live-app videos (footage `live`) also ask:
 
 | Ask | Default when unanswered |
 |---|---|

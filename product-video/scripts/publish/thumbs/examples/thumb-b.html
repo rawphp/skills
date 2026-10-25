@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=Caveat:wght@700&display=block" rel="stylesheet"><link rel="stylesheet" href="../base.css"><style>
+.h{position:absolute;left:52px;top:130px;font-weight:900;line-height:.95;letter-spacing:-3px}
+.h .l1{font-size:128px} .h .l1 span{color:#FF3B30;font-family:'SF Mono',Menlo,monospace;letter-spacing:-8px}
+.h .l2{font-size:70px;margin-top:22px}
+.h .l3{font-size:70px;color:#FBBF24}
+.hub{position:absolute;left:975px;top:390px;width:200px;height:200px;margin:-100px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2A1418,#140C12);border:5px solid #FF3B30;box-shadow:0 0 80px rgba(255,59,48,.55);display:grid;place-content:center;font-size:44px;font-weight:900;font-family:'SF Mono',Menlo,monospace}
+.n{position:absolute;padding:12px 18px;border-radius:16px;background:#141A2A;border:2px solid #2A3350;font-size:26px;font-weight:800;white-space:nowrap;transform:translate(-50%,-50%)}
+svg{position:absolute;inset:0}
+</style></head><body><div class="grid"></div>
+<div class="brand"><i></i>LARAVEL <span>CAPABILITIES</span></div>
+<div class="h"><div class="l1">ONE <span>run()</span></div><div class="l2">EVERY CHANNEL.</div><div class="l3">SAME RULES.</div></div>
+<svg width="1280" height="720"></svg><div class="hub">run()</div>
+<script>
+const N=[['🌐 Web',180],['🔌 API',235],['⏱️ Jobs',290],['🤖 Agent',345],['🧩 MCP',40],['⌨️ CLI',95],['💬 Chat',140]];
+let s='';for(const [l,a] of N){const x=975+200*Math.cos(a*Math.PI/180),y=390+200*Math.sin(a*Math.PI/180);s+='<line x1="'+x+'" y1="'+y+'" x2="975" y2="390" stroke="#FF3B30" stroke-opacity=".6" stroke-width="4"/>';document.body.insertAdjacentHTML('beforeend','<div class="n" style="left:'+x+'px;top:'+y+'px">'+l+'</div>')}
+document.querySelector('svg').innerHTML=s;
+</script><div class="vig" style="opacity:.5"></div></body></html>
