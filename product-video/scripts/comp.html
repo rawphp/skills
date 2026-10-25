@@ -19,6 +19,7 @@
   .sticker { position: absolute; font-family: Caveat, cursive; font-weight: 700; color: var(--ink); background: #FFE58F; padding: 14px 26px 16px; border-radius: 6px;
     box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 -3px 0 rgba(0,0,0,.06); white-space: pre; line-height: 1.02; text-align: center; transform-origin: 50% 50%; }
   .sticker.emoji { background: none; box-shadow: none; padding: 0; font-family: 'Apple Color Emoji', sans-serif; }
+  #cap.top { bottom: auto; top: 34px; }
   #cap { position: absolute; left: 50%; bottom: 44px; transform: translateX(-50%); max-width: 1500px; padding: 12px 28px 14px; border-radius: 14px;
     background: rgba(18,32,56,.86); color: #fff; font-size: 38px; font-weight: 600; letter-spacing: -.2px; text-align: center; line-height: 1.25; white-space: nowrap; }
   .card { position: absolute; inset: 0; }
@@ -216,7 +217,7 @@ function cursorAt(s, lt) {
 const toScreen = (v, x, y) => ({ x: (x - v.x) * (W / v.w), y: (y - v.y) * (H / v.h), z: W / v.w });
 async function drawFootage(ctx, s, lt) {
   const im = await img(frameAt(s, lt)); const v = viewAt(s, lt);
-  ctx.drawImage(im, v.x * SRC, v.y * SRC, v.w * SRC, v.h * SRC, 0, 0, W, H);
+  const k = s.src || SRC; ctx.drawImage(im, v.x * k, v.y * k, v.w * k, v.h * k, 0, 0, W, H);
   return v;
 }
 const sceneAt = (t) => { let s = TL.scenes[0]; for (const x of TL.scenes) if (t >= x.start) s = x; return s; };
@@ -236,14 +237,21 @@ window.renderAt = async (t) => {
   const onEnd = s.endAt !== undefined && lt >= s.endAt;
 
   if (s.type === 'card') {
-    const el = cardEl[s.id]; show(el, true); T[s.card.template].draw(el, s.card, lt, s);
+    const el = cardEl[s.id];
+    // Cards wipe in over whatever came before: the last frame of a walk, or the previous card held at its end.
+    const pv = TL.scenes[TL.scenes.indexOf(s) - 1];
+    if (pv && lt < 0.5 && !s.card.scratch) {
+      if (pv.type === 'footage') { await drawFootage(pctx, pv, pv.endAt ?? pv.dur); $('prev').style.opacity = 1; }
+      else { const pe = cardEl[pv.id]; show(pe, true); T[pv.card.template].draw(pe, pv.card, pv.dur, pv); }
+    }
+    show(el, true); T[s.card.template].draw(el, s.card, lt, s);
   } else {
     const ft = s.endAt !== undefined ? Math.min(lt, s.endAt) : lt;
     const v = await drawFootage(fctx, s, ft);
     $('rings').innerHTML = s.rings.filter((r) => lt >= r.t && lt <= r.t + r.dur).map((r) => {
       const a = toScreen(v, r.rect.x, r.rect.y), b = toScreen(v, r.rect.x + r.rect.w, r.rect.y + r.rect.h);
       const pin = easeOut(prog(lt, r.t, 0.35)), out = prog(lt, r.t + r.dur - 0.35, 0.35);
-      return `<div class="ring" style="left:${a.x}px;top:${a.y}px;width:${b.x - a.x}px;height:${b.y - a.y}px;opacity:${pin * (1 - out)};transform:scale(${1.12 - 0.12 * pin})"></div>`;
+      return `<div class="ring" style="left:${a.x - 5}px;top:${a.y - 5}px;width:${b.x - a.x + 10}px;height:${b.y - a.y + 10}px;opacity:${pin * (1 - out)};transform:scale(${1.12 - 0.12 * pin})"></div>`;
     }).join('');
     $('ripples').innerHTML = s.clicks.filter((c) => lt >= c[0] && lt <= c[0] + 0.5).map((c) => {
       const p = prog(lt, c[0], 0.5), q = toScreen(v, c[1], c[2]); const r = (10 + 34 * easeOut(p)) * Math.min(q.z, 1.8);
@@ -272,7 +280,7 @@ window.renderAt = async (t) => {
   }
   if (onEnd) { show(cardEl.end, true); T[TL.end.template].draw(cardEl.end, TL.end, lt - s.endAt, s); }
   const c = TL.captions.find((x) => t >= x.t0 && t < x.t1);
-  if (c && !onEnd) { $('cap').textContent = c.text; show($('cap'), true); } else show($('cap'), false);
+  if (c && !onEnd) { $('cap').textContent = c.text; show($('cap'), true); $('cap').classList.toggle('top', s.type === 'footage' && !s.capBottom); } else show($('cap'), false);
   $('fade').style.opacity = Math.max(1 - t / 0.5, prog(t, TL.total - 0.8, 0.8));
 };
 </script>

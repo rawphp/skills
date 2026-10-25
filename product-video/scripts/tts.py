@@ -5,6 +5,7 @@
 import json, os, sys, base64, urllib.request, urllib.error
 
 cfg = json.load(open('video.json'))['voice']
+if cfg.get('id','').startswith('ENV:'): cfg['id'] = os.environ[cfg['id'][4:]]  # voice id from the environment
 if not cfg.get('id') or cfg['id'].startswith('<'):
     sys.exit('video.json voice.id is not set. Pick a voice at the approval gate (references/script-writing.md)')
 script = json.load(open('script.json'))

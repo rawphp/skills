@@ -1,0 +1,2 @@
+[ {"id": "s01", "vo": "One card.", "card": {"template": "title", "title": "Smoke", "sub": {"text": "engine", "at": "card."}}},
+  {"id": "s02", "vo": "One footage ring here.", "capBottom": true} ]

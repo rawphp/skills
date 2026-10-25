@@ -23,4 +23,6 @@ else
     echo "MISS elevenlabs — key rejected (HTTP $code). Check it at elevenlabs.io under API keys"; bad=1
   fi
 fi
+# --project <dir>: refuse a project that carries a copied engine (drift). Reference scripts by path ($SK) instead.
+if [ "${1:-}" = "--project" ] && [ -d "$2/engine" ]; then echo "MISS project — $2/engine exists; delete it and call the engine by path: SK=$dir"; bad=1; fi
 exit $bad

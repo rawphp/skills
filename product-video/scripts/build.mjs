@@ -25,11 +25,13 @@ function captionWords(words) {
 }
 function captions(words, offset) {
   const chunks = []; let cur = [];
-  for (const w of captionWords(words)) {
+  const cw = captionWords(words);
+  cw.forEach((w, i) => {
     cur.push(w);
     const text = cur.map((x) => x.w).join(' ');
-    if (/[.?!]$/.test(w.w) || text.length > 44 || (/,$/.test(w.w) && text.length > 26)) { chunks.push(cur); cur = []; }
-  }
+    let left = 0; for (let j = i + 1; j < cw.length; j++) { left++; if (/[.?!]$/.test(cw[j].w)) break; }   // words to the sentence end
+    if (/[.?!]$/.test(w.w) || (text.length > 52 && left > 2) || text.length > 64 || (/,$/.test(w.w) && text.length > 30 && left > 2)) { chunks.push(cur); cur = []; }
+  });
   if (cur.length) chunks.push(cur);
   return chunks.map((c, i) => ({
     t0: offset + c[0].s,
@@ -63,7 +65,7 @@ for (const line of script) {
     const metaPath = `footage/${id}/meta.json`;
     if (!fs.existsSync(metaPath)) throw new Error(`${id}: no ${metaPath}. Record it (rec.mjs ${id}) or give it a card`);
     const m = JSON.parse(fs.readFileSync(metaPath));
-    s = { id, type: 'footage', dir: path.resolve(`footage/${id}`), dur: m.dur, frames: m.frames, path: m.path, clicks: m.clicks, cam: m.cam, rings: m.rings, stickers: m.stickers };
+    s = { id, type: 'footage', dir: path.resolve(`footage/${id}`), src: m.src, dur: m.dur, frames: m.frames, path: m.path, clicks: m.clicks, cam: m.cam, rings: m.rings, stickers: m.stickers, capBottom: !!line.capBottom };
     for (const c of m.clicks) sfx.push({ t: t + c[0], name: 'click', vol: 0.4 });
     for (const [a, b] of m.typing) sfx.push({ t: t + a, name: 'typing', vol: 0.28, len: Math.max(0.3, b - a + 0.1) });
     for (const e of m.sfx) sfx.push({ t: t + e.t, name: e.name, vol: e.vol });

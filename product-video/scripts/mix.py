@@ -37,13 +37,19 @@ for e in A['sfx']:
 stem('mix/sfx.wav', sfx)
 # Music: bed A (cut by the cold-open scratch) and bed B (to the end, 3.5s fade). Loops if the track is short.
 M = A['music']; beds = []
+if M and cfg.get('music', {}).get('fileA'): M['fileA'] = cfg['music']['fileA']
 if M:
     for key, fin in (('a', 0), ('b', 0.4)):
         bed = M.get(key)
         if not bed: continue
         ln = bed['t1'] - bed['t0']; fade = 0.08 if key == 'a' else 3.5
-        beds.append((M['file'], bed['t0'], f"aloop=loop=-1:size=2e9,atrim=0:{ln:.2f}" + (f",afade=t=in:d={fin}" if fin else '') + f",afade=t=out:st={ln - fade:.2f}:d={fade}"))
+        beds.append((M.get('fileA', M['file']) if key == 'a' else M['file'], bed['t0'], f"aloop=loop=-1:size=2e9,atrim=0:{ln:.2f}" + (f",afade=t=in:d={fin}" if fin else '') + f",afade=t=out:st={ln - fade:.2f}:d={fade}"))
 stem('mix/music.wav', beds)
+# Build: the bed rises by music.build dB from its start to the last minute, so the energy climbs toward the recap.
+if M and cfg['music'].get('build'):
+    b0 = M['b']['t0']; b1 = max(b0 + 1, TOTAL - 50); g = cfg['music']['build']
+    ff(['-i', 'mix/music.wav', '-af', f"volume='pow(10,({g}*min(1,max(0,(t-{b0})/{b1 - b0})))/20)':eval=frame", '-c:a', 'pcm_f32le', 'mix/music_b.wav'])
+    os.replace('mix/music_b.wav', 'mix/music.wav')
 
 vo_g = -16 - float(lufs('mix/vo.wav')['input_i'])
 mu_i = lufs('mix/music.wav')['input_i']; mu_g = (M['lufs'] - float(mu_i)) if M and mu_i not in ('-inf', '-70.00') else 0
