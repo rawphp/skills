@@ -29,7 +29,7 @@ Not logged in: ask the user for a token from Profile › Access tokens, then `ca
 Ask once for what the project folder cannot tell you:
 
 - **Audience and purpose.** `spec_review` or `build_signoff` close with a Sign-off and record a verdict; `delivery_feedback` closes with "Anything you'd change, now you've seen it?"; `custom` has no defaults. A finished feature shown to its users is `delivery_feedback`. The spec-approval preset maps to `spec_review`, build-summary to `build_signoff`.
-- **Title.** The viewer sees it on the first screen: write it for them ("KPI catch-ups: Mark n/a"), not the branch name.
+- **Title.** The viewer sees it on the first screen: write it for them ("Invoices: mark one as paid"), not the branch name.
 - **Who gets a link.** Names and emails, and whether to email now or hold. Default: hold. `invites.create` emails unless `send_email` is false.
 
 ## Workflow

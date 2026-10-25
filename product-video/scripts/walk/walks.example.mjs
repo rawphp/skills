@@ -4,7 +4,7 @@ import path from "node:path"
 import { pathToFileURL } from "node:url"
 const { walk } = await import(pathToFileURL(path.join(process.env.SK, "walk/harness.mjs")).href)
 
-export const w1 = () => walk("w1-help", { identity: "demo-user" }, async (h) => {
+export const w1 = () => walk("w1-help", { identity: "demo-user" /* seeded under WALK_IDENTITY_KEY when set */ }, async (h) => {
   const { page, say, click, go, pause } = h
   await go("/help", "Help")
   await say("One sentence on what this walk proves.")

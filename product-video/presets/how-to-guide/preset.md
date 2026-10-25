@@ -1,5 +1,5 @@
 ---
-source: the Help Centre article(s) for the task and the live app in demo mode as the persona the article is for
+source: the help article(s) for the task and the live app in demo mode as the persona the article is for
 footage: live
 shape:
   - title — the task in the article's own words, who it is for

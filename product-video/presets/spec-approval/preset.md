@@ -1,5 +1,5 @@
 ---
-source: one spec page in tc-docs (requirements table, decisions, open questions); no footage, no product screens unless a mock exists in the spec
+source: one spec page (requirements table, decisions, open questions); no footage, no product screens unless a mock exists in the spec
 footage: cards
 shape:
   - title — product, "Phase N spec", owner, date

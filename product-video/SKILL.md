@@ -15,7 +15,7 @@ Three layers in one folder.
 
 - **Engine** (`scripts/`). Compositor, build, render, mix, voice, sound effects, QA, the geometry gate, both footage front-ends (`rec.mjs` records a live app; `cut.py` and its measuring tools cut recorded tape), the walk recorder (`scripts/walk/`), the review stills, the deliverables, and the publish scripts (`scripts/publish/`). It holds no product words.
 - **Line** (this file). Seven stages, in order. Stage 7 runs only when a publish target is named.
-- **Presets** (`presets/`). One per video type (`build-summary`, `spec-approval`, `how-to-guide`, `pr-brief`), the house style (`trilogy`), and the two publish targets. `presets/README.md` explains the keys.
+- **Presets** (`presets/`). One per video type (`build-summary`, `spec-approval`, `how-to-guide`, `pr-brief`), the example house style (`house`), and the two publish targets. `presets/README.md` explains the keys.
 
 Every project, whatever the preset, is one folder holding the same files: `PLAN.md`, `video.json`, `script.json`, one of `cuts.json` (tape), `scenes.mjs` (live) or neither (cards only), `cards.js`, `audio/`, `footage/`, `timeline.json`, `VALIDATE.md`, and the deliverables `<name>.mp4`, `<name>.srt`, `contact-sheet.jpg`, `script.md`. Default location: `output/product-video/<slug>/` in the product repo, gitignored. Product selectors, seeds, reset scripts and walk scripts live in that folder, never in this skill.
 
@@ -44,7 +44,7 @@ df -h .                                  # free disk
 
 ## Stage 1. Plan
 
-Read `references/brief.md` and run it: answer from the repo what the repo can, then ask the user once, with every default filled in. Read the chosen `presets/<type>/preset.md` and the house preset (`presets/trilogy/`, or another brand's). Copy the house `video.json` and `cards.js` into the project and set `output`; copy `audio/sfx/` so no sfx credits are spent.
+Read `references/brief.md` and run it: answer from the repo what the repo can, then ask the user once, with every default filled in. Read the chosen `presets/<type>/preset.md` and the house preset (`presets/house/`, or the brand's own folder the brief names). Copy the house `video.json` and `cards.js` into the project and set `output`; copy `audio/sfx/` so no sfx credits are spent.
 
 Write `PLAN.md` before any audio or frames:
 
@@ -82,7 +82,7 @@ The walk tool burns a caption chip into the bottom of each frame. `cuts.json` na
 
 ## Stage 3. Script
 
-Read `references/script-writing.md`. Write `script.json` in the preset's `shape`; every card the shape lists is required. Write `video.json` from the house copy. A card that needs its own template goes in `cards.js` (`references/api.md`; house style notes in `references/tcv-cards.md`).
+Read `references/script-writing.md`. Write `script.json` in the preset's `shape`; every card the shape lists is required. Write `video.json` from the house copy. A card that needs its own template goes in `cards.js` (`references/api.md`).
 
 - Footage lines are short, one idea a sentence. Plant a distinct cue word on each control the picture must hit.
 - A cue word occurs once in its line, or carries `n` (and `ring_n` whenever `n` is set). `gate.py` fails an ambiguous cue.

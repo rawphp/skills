@@ -8,7 +8,7 @@ A preset is a video type. It changes what the line reads and what the script say
 
 | Key | Meaning |
 |---|---|
-| `source` | What the line reads for claims (a spec page, walk recordings, a Help Centre article, a PR) |
+| `source` | What the line reads for claims (a spec page, walk recordings, a help article, a PR) |
 | `footage` | `cards` (no footage), `tape` (recorded walks, cut with `cut.py`), or `live` (the app recorded by `rec.mjs`) |
 | `shape` | The ordered scene list, one line each |
 | `tone` | 0–10 and three words |
@@ -28,7 +28,7 @@ Optional keys: `cards` (a folder with its own `cards.js`), `voice`, `music`.
 
 ## House presets
 
-`presets/trilogy/` is the brand, not a type: `cards.js` (the house card templates; cards take `walks` for the walk count and `fig` for the figure label), `video.json` (voice as `ENV:ELEVEN_LABS_VOICE_ID`, music, brand colours, sfx prompts, credits; copy it into the project and set `output`), `audio/sfx/` (copy into the project's `audio/sfx/` so no sfx credits are spent) and `music/` (two Kevin MacLeod beds, CC BY 4.0; the credit is in `video.json`). Set `music.file` and `music.fileA` to wherever the project keeps the copies.
+A house preset is the brand, not a type. `presets/house/` is the neutral example that ships with the skill; a brand keeps its own copy of the folder outside the skill and names it in the brief. It holds: `cards.js` (the house card templates; cards take `walks` for the walk count and `fig` for the figure label), `video.json` (voice as `ENV:ELEVEN_LABS_VOICE_ID`, music, brand colours, sfx prompts, credits; copy it into the project and set `output`), `audio/sfx/` (generated once with `sfx.py` from the prompts in `video.json`, then copied into each project's `audio/sfx/` so no credits are spent) and `music/` (the beds `video.json` names; the example credits two Kevin MacLeod tracks, CC BY 4.0, downloaded from incompetech.com). Set `music.file` and `music.fileA` to wherever the project keeps the copies.
 
 ## Publish targets
 

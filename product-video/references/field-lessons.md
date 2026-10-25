@@ -105,7 +105,7 @@ Default: `addInitScript` a stub `getUserMedia` (empty MediaStream) and a stub `M
 ### 16. The house tick helper takes a scale
 
 Symptom: a tick drawn the height of the card.
-Cause: the tc-video `tick(x, y, s, color, k)` helper takes a scale, not a pixel size, and `s = 18` was passed.
+Cause: a canvas `tick(x, y, s, color, k)` helper took a scale, not a pixel size, and `s = 18` was passed.
 Default: use a scale of about 1.
 
 ## Publish

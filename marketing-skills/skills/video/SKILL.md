@@ -5,7 +5,7 @@ metadata:
   version: 2.0.1
 ---
 
-If the request is to make a narrated product video (a phase update, build summary, spec approval, how-to, PR brief, demo or walkthrough of an app), stop and invoke the `product-video` skill; it calls this skill's tools by path when a stage needs them. Carry on here only for this skill's own output.
+If the request is to make a narrated product video (a phase update, build summary, spec approval, how-to, PR brief, demo or walkthrough of an app), stop and invoke the `product-video` skill; it calls this skill's tools by path when a stage needs them. Carry on here only for this skill's own output: an AI avatar, talking-head, generated-footage or programmatic video stays here even when it is for a product launch.
 
 # Video
 

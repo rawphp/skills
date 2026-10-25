@@ -1,5 +1,5 @@
 {
-  "_": "house preset: copy into the project and set output",
+  "_": "example house preset: copy into the project and set output; a brand keeps its own copy of this folder outside the skill",
   "pace": {
     "lead": 0.35,
     "tail": 0.45
@@ -14,24 +14,24 @@
   },
   "captions": {
     "replace": {
-      "Phase three": "Phase 3",
-      "H C A": "HCA",
-      "one forty": "$140"
+      "R and D": "R&D",
+      "Phase three": "Phase 3"
     }
   },
   "brand": {
-    "primary": "#1e3452",
-    "accent": "#2f9e9c",
-    "accent2": "#64bcea",
-    "highlight": "#ffbd36",
-    "ink": "#16202e"
+    "primary": "#1e293b",
+    "accent": "#0f766e",
+    "accent2": "#7dd3fc",
+    "highlight": "#f59e0b",
+    "ink": "#0f172a"
   },
   "music": {
     "file": "music/life-of-riley.mp3",
     "fileA": "music/local-forecast-elevator.mp3",
     "from": "title",
     "lufs": -25,
-    "build": 4
+    "build": 4,
+    "_": "download both beds from incompetech.com (CC BY 4.0) into the project's music/; the credit below names them"
   },
   "sfx": {
     "riser": [

@@ -1,4 +1,4 @@
 { "output": "out/smoke.mp4", "pace": {"lead": 0.35, "tail": 0.45},
   "voice": {"id": "ENV:ELEVEN_LABS_VOICE_ID", "model": "eleven_multilingual_v2"},
-  "brand": {"primary": "#1e3452", "accent": "#2f9e9c", "accent2": "#64bcea", "highlight": "#ffbd36", "ink": "#16202e"},
+  "brand": {"primary": "#1e293b", "accent": "#0f766e", "accent2": "#7dd3fc", "highlight": "#f59e0b", "ink": "#0f172a"},
   "credits": ["Smoke"] }

@@ -20,6 +20,7 @@ The brief is done when every row below has a recorded value.
 | **Tone words**: three adjectives, plus one line the user would say about this release | "Dry, confident, plain." |
 | **Hard no's**: people, topics or words that are off limits | Never joke about a person, a team or a customer. Sensitive labels (pay, ratings, health, performance) need sign-off before a line leans on them. |
 | **Length** | Phase or release update: about 2:30–3:00, each walk footage scene under 15 s. Feature tour: the shortest video that covers the tasks. |
+| **House preset**: the brand's folder of `cards.js`, `video.json`, `audio/sfx/`, `music/` | The folder the last video for this product used; with none, `presets/house/` in the skill. |
 | **Reference video**: "like this one" | The last video for this product, found on disk. |
 | **Narrator**: accent, gender, energy | The reference video's voice. With no reference, an accent that matches the audience's country. |
 | **Music and energy** | The reference video's bed. With no reference, a CC BY Kevin MacLeod track picked by humour level (`script-writing.md`, Music). Humour 5 and up uses `pace` `{lead: 0.35, tail: 0.45}`. |

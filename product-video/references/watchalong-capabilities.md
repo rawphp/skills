@@ -32,7 +32,7 @@ capabilities --profile=watchalong run walkthroughs.confirm-video \
   --input="$(jq -c '{walkthrough_id: .data.walkthrough_id, upload_id: .data.upload.upload_id}' import-result.json)"
 ```
 
-`confirm-video` returns `video_bytes` and `duration_seconds`. A 20 MB mp4 uploads in a few seconds from Sydney.
+`confirm-video` returns `video_bytes` and `duration_seconds`. A 20 MB mp4 uploads in a few seconds.
 
 ## walkthroughs.attach-document
 
@@ -47,7 +47,7 @@ capabilities --profile=watchalong run walkthroughs.attach-document --input-file=
 
 ```json
 {"walkthrough_id": "...", "checkpoints": [
-  {"time": 33, "kind": "comprehension", "question": "Does finding and ticking people on the Everyone screen work the way you'd use it?"},
+  {"time": 33, "kind": "comprehension", "question": "Does finding and ticking people on the list screen work the way you'd use it?"},
   {"time": 85, "kind": "open", "question": "Anything you'd change, now you've seen it?"}
 ]}
 ```

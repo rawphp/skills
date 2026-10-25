@@ -5,6 +5,7 @@
 //   WALK_OUT      where the walk .webm/.mp4/-sheet.png files go
 //   WALK_FIXTURE  a file the walks upload (e.g. an import CSV)
 //   WALK_PROJECT  the frontend dir whose node_modules/playwright is used
+//   WALK_IDENTITY_KEY  optional: the sessionStorage key the app reads its demo identity from; walk(name, { identity }) seeds it
 // The project's walks.mjs imports { walk } from this file; run.mjs runs them.
 import { createRequire } from "node:module"
 import { mkdirSync, renameSync, existsSync } from "node:fs"
@@ -51,8 +52,9 @@ export async function walk(name, { identity, width = 1440, height = 900 }, steps
   mkdirSync(OUT, { recursive: true })
   const browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({ viewport: { width, height }, recordVideo: { dir: path.join(OUT, ".raw"), size: { width, height } }, locale: "en-AU", timezoneId: "Australia/Sydney" })
-  // The demo identity, set once (never on a later navigation: the user menu's switch must stick).
-  await context.addInitScript((who) => { try { if (!sessionStorage.getItem("tc-demo-identity")) sessionStorage.setItem("tc-demo-identity", who) } catch {} }, identity)
+  // The demo identity, set once (never on a later navigation: an in-app switch must stick).
+  const identityKey = process.env.WALK_IDENTITY_KEY
+  if (identity && identityKey) await context.addInitScript(([k, who]) => { try { if (!sessionStorage.getItem(k)) sessionStorage.setItem(k, who) } catch {} }, [identityKey, identity])
   await context.addInitScript(OVERLAY)
   const page = await context.newPage()
   page.setDefaultTimeout(60_000)
@@ -114,14 +116,6 @@ function helpers(page) {
     await page.waitForTimeout(900)
   }
   const pause = (ms) => page.waitForTimeout(ms)
-  const switchUser = async (name) => {
-    await click(page.getByRole("button", { name: /Open profile for/ }))
-    const sub = page.getByRole("menuitem", { name: /Viewing as/ })
-    const b = await sub.boundingBox(); await glide(b.x + b.width / 2, b.y + b.height / 2); await pause(800)
-    const list = page.locator('[aria-label="Switch demo user"]')
-    if (!(await list.isVisible().catch(() => false))) { await sub.click(); await pause(600) }
-    await click(list.locator("[role^=menuitem]").filter({ hasText: name }).first(), { settle: 3500 })
-    await page.waitForLoadState("networkidle", { timeout: 90_000 }).catch(() => {})
-  }
-  return { page, say, click, type, go, pause, switchUser, glide }
+  // Product-specific moves (a demo-user switcher, a login) live in the project's walks.mjs, built from page, click and glide.
+  return { page, say, click, type, go, pause, glide }
 }
