@@ -26,6 +26,7 @@ Create missing `factory:*` labels with the colours in the factory's add-a-repo g
 | `type:fix` | `d73a4a` |
 | `type:refactor` | `5319e7` |
 | `type:docs` | `0075ca` |
+| `type:test` | `fbca04` |
 | `type:chore` | `ededed` |
 
 ## Create
