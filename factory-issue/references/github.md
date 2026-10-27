@@ -10,22 +10,30 @@ gh api user -q .login          # must be in factory.instructors of {repo}/.dw/co
 
 ## Labels
 
-Labels: `factory:proposed`, `factory:ready`, `factory:needs-info`, `factory:triage`, `factory:building`, `factory:pr-open`, `factory:stuck`. Only the first two are yours to set; the factory writes the rest.
+Labels: `factory:proposed`, `factory:ready`, `factory:needs-info`, `factory:triage`, `factory:building`, `factory:pr-open`, `factory:stuck`. Only the first two are yours to set; the factory writes the rest. The `type:*` labels (`SKILL.md` step 3) are this skill's own; the factory ignores them.
 
 A watched repo can still lack them. Check before filing, or every create fails on the label:
 
 ```sh
-gh label list -R OWNER/REPO --search factory --json name   # prints nothing, not [], when none match
+gh label list -R OWNER/REPO --limit 200 --json name --jq '.[].name' | grep -E '^(factory|type):'
 ```
 
-Create any missing ones with the colours in the factory's add-a-repo guide (`factory/site/guide/add-a-repo.md` in t3code-factory), for example `gh label create factory:proposed -R OWNER/REPO --color c5def5`.
+Create missing `factory:*` labels with the colours in the factory's add-a-repo guide (`factory/site/guide/add-a-repo.md` in t3code-factory), for example `gh label create factory:proposed -R OWNER/REPO --color c5def5`. Create missing `type:*` labels with these colours, one command each:
+
+| Label | Colour |
+|---|---|
+| `type:feat` | `a2eeef` |
+| `type:fix` | `d73a4a` |
+| `type:refactor` | `5319e7` |
+| `type:docs` | `0075ca` |
+| `type:chore` | `ededed` |
 
 ## Create
 
 Write the body to a file first; it keeps headings and code fences intact.
 
 ```sh
-gh issue create -R OWNER/REPO --title "<outcome in one line>" --body-file body.md --label factory:proposed
+gh issue create -R OWNER/REPO --title "<type>: <outcome in one line>" --body-file body.md --label factory:proposed --label type:<type>
 ```
 
 ## Link a dependency (blocked by)

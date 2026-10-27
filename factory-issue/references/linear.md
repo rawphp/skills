@@ -20,7 +20,7 @@ File through the `linear` skill (the Linear MCP, your own login). Your Linear di
 
 ## Create
 
-Resolve the team by its key (`list_teams`), then `create_issue` with the title, the four-heading body, the team, and the label `factory:proposed`. No assignee, no state change: the factory refuses an assigned issue and claims from any state that is not completed or canceled. Capture the identifier (`ENG-42`) from the result.
+Resolve the team by its key (`list_teams`), then `create_issue` with the `<type>: ` title, the four-heading body, the team, and the labels `factory:proposed` and `type:<type>`. Create a missing `type:*` label on the team first. The pull request title reads `ENG-42: fix: …`. No assignee, no state change: the factory refuses an assigned issue and claims from any state that is not completed or canceled. Capture the identifier (`ENG-42`) from the result.
 
 Labels are the same seven as GitHub, on the team: `factory:proposed`, `factory:ready`, `factory:needs-info`, `factory:triage`, `factory:building`, `factory:pr-open`, `factory:stuck`. Only the first two are yours to set. A team missing them is not set up for the factory; `softfac repo add ... --tracker linear` creates them.
 
