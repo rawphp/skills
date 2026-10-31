@@ -85,6 +85,7 @@ Installer template: [`skills-hub/references/install-template.sh`](./skills-hub/r
 | [`code-review`](./code-review/SKILL.md) | Maintainability review of a branch or PR (light / medium / deep) |
 | [`release-safe`](./release-safe/SKILL.md) | Release gate for breaking changes and client-visible risk |
 | [`branch-ship-loop`](./branch-ship-loop/SKILL.md) | Loop code-review and release-safe until a branch is ship-ready |
+| [`review-loop`](./review-loop/SKILL.md) | Fix a PR's review-gate findings, push, re-review until the pushed head scores 5/5 |
 | [`devils-advocate-loop`](./devils-advocate-loop/SKILL.md) | Multi-round critic ↔ builder loop on a design or rollout plan |
 | [`product-video`](./product-video/SKILL.md) | Any narrated product video (build summary, spec approval, how-to, PR brief), from brief to published link |
 
