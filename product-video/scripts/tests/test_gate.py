@@ -20,3 +20,12 @@ def test_stroke_is_screen_px_not_zoomed():
     # The compositor draws the 5 px ring stroke in screen px after the camera zoom: a toast ring 12 src px above the
     # frame bottom at zoom 1.7 keeps 12 * 1.7 - 5 = 15 px. Scaling the stroke by the zoom would report 12 * 1.7 - 8.5 = 11.9 and fail it.
     code, out = run('edge-zoomed'); assert code == 0 and '0 failures' in out, out
+def test_camera_out_means_whole_frame():
+    # rec.mjs records camOut as {t, dur, full: true} with no rect; the view after it is the full frame at zoom 1.
+    code, out = run('camout'); assert code == 0 and '0 failures' in out, out
+def test_scene_with_no_camera_moves_passes():
+    code, out = run('nocam'); assert code == 0 and '0 failures' in out, out
+def test_before_the_first_camera_move_is_whole_frame():
+    # comp.html shows the full frame until a scene's first cam starts. A ring before a late first zoom is judged at zoom 1,
+    # not under that zoom (where it would sit hundreds of px off the view).
+    code, out = run('latecam'); assert code == 0 and '0 failures' in out, out

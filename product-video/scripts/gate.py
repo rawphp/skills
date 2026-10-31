@@ -9,8 +9,11 @@ norm = lambda s: ''.join(c for c in s.lower() if c.isalnum() or c == '-')
 fails, warns, nrings = [], [], 0
 def fail(scene, i, check, detail): fails.append(f'FAIL {scene}-{i} {check}: {detail}')
 def view_at(scene, t):   # camera view rect (output px) at scene-local t: the last cam entry whose t <= t, padded 1.3 about its centre, capped by zoom
-    cams = [c for c in scene['cam'] if c['t'] <= t + 1e-6] or scene['cam'][:1]
-    c = cams[-1]; r = c['rect']; pad = c.get('pad', 1.3); z = max(1.0, min(c['zoom'], W / (r['w'] * pad), H / (r['h'] * pad)))
+    cams = [c for c in scene.get('cam', []) if c['t'] <= t + 1e-6]
+    if not cams: return 0, 0, W, H, 1.0   # before the first camera move (or none): the whole frame, as comp.html shows it
+    c = cams[-1]
+    if c.get('full') or 'rect' not in c: return 0, 0, W, H, 1.0   # camOut: the whole frame
+    r = c['rect']; pad = c.get('pad', 1.3); z = max(1.0, min(c['zoom'], W / (r['w'] * pad), H / (r['h'] * pad)))
     vw, vh = W / z, H / z; cx, cy = r['x'] + r['w'] / 2, r['y'] + r['h'] / 2
     x0 = min(max(0, cx - vw / 2), W - vw); y0 = min(max(0, cy - vh / 2), H - vh)
     return x0, y0, x0 + vw, y0 + vh, z
