@@ -14,7 +14,11 @@ if [ -z "$ELEVEN_LABS_API_KEY" ]; then
 else
   r=$(curl -s -m 10 -w '\n%{http_code}' -H "xi-api-key: $ELEVEN_LABS_API_KEY" https://api.elevenlabs.io/v1/user/subscription)
   code=${r##*$'\n'}; body=${r%$'\n'*}
-  if [ "$code" = 200 ]; then
+  # a past_due or unpaid subscription still answers this read, then the first tts.py call fails 401 payment_required
+  sub=$(python3 -c 'import sys,json; print(json.load(sys.stdin).get("status", ""))' <<<"$body" 2>/dev/null)
+  if [ "$code" = 200 ] && [[ "$sub" =~ ^(past_due|unpaid|incomplete|incomplete_expired|canceled)$ ]]; then
+    echo "MISS elevenlabs — subscription is $sub; voice generation will fail until it is paid"; bad=1
+  elif [ "$code" = 200 ]; then
     echo "ok   elevenlabs — $(python3 -c 'import sys,json; d=json.load(sys.stdin); print(d["tier"], "tier,", d["character_limit"] - d["character_count"], "characters left")' <<<"$body")"
   elif [ "$code" = 000 ]; then
     echo "MISS elevenlabs — can't reach api.elevenlabs.io"; bad=1

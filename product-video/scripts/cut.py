@@ -94,6 +94,8 @@ def build(walk):
         rnext = t1
         if i + 1 < len(segs): rnext = LEAD + word_t(words, segs[i + 1]['at'], segs[i + 1].get('n', 1))
         if not (t0 - 1e-6 <= r0 < t1): sys.exit(f'{walk} seg{i}: ring cue {r0:.2f}s is outside its segment {t0:.2f}-{t1:.2f}')
+        # the ring's still (cue + 0.3 s) must show this segment's footage, not the next cut's
+        if r0 + 0.3 > t1 - 0.1 + 1e-6: sys.exit(f'{walk} seg{i}: ring still at {r0 + 0.3:.2f}s lands on the cut at {t1:.2f}s; cue the ring at least 0.7 s before the next segment\'s cue word')
         rend = min(r0 + s.get('hold', 1.8), cap_end, rnext - 0.1, t1 - 0.04)
         rdur = max(0.5, rend - r0)
         rings.append({'t': round(r0, 3), 'dur': round(rdur, 3), 'rect': rr})
@@ -105,7 +107,10 @@ def build(walk):
         if i: sfx.append({'t': t0 - 0.04, 'name': 'whoosh', 'vol': 0.13})
         if 'sticker' in s:
             sk = s['sticker']; t = LEAD + word_t(words, sk['at'], sk.get('n', 1))
-            stickers.append({'t': t, 'dur': max(1.2, min(sk.get('dur', 2.4), t1 - t - 0.05, dur - t - 0.1)), 'text': sk['text'],
+            kdur = max(1.2, min(sk.get('dur', 2.4), t1 - t - 0.05, dur - t - 0.1))
+            # the 1.2 s floor would carry the sticker across the cut onto the next screen
+            if t + kdur > t1 + 1e-6: sys.exit(f'{walk} seg{i}: sticker "{sk["text"]}" at {t:.2f}s rides across the cut at {t1:.2f}s; cue it at least 1.3 s before the next segment\'s cue word')
+            stickers.append({'t': t, 'dur': kdur, 'text': sk['text'],
                              'x': sk.get('x', 1650), 'y': sk.get('y', 215), 'rot': sk.get('rot', -5), 'size': sk.get('size', 50)})
             sfx.append({'t': t, 'name': sk.get('sfx', 'nope'), 'vol': 0.42})
     sfx.append({'t': dur - 1.1, 'name': 'riser', 'vol': 0.22})   # lift into the next chapter card

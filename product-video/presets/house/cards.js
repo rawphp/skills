@@ -5,10 +5,13 @@
   const fonts = document.createElement('link');
   fonts.rel = 'stylesheet';
   fonts.href = 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=block';
+  // document.fonts.load() before the stylesheet arrives finds no faces and waits for nothing: the first still falls back
+  const sheet = new Promise((ok) => { fonts.onload = fonts.onerror = ok; });
   document.head.appendChild(fonts);
   const setup0 = window.setup;
   window.setup = async (tl) => {
     await setup0(tl);
+    await sheet;
     for (const f of ['700 40px "Space Grotesk"', '500 40px "Space Grotesk"', '400 20px "JetBrains Mono"', '700 20px "JetBrains Mono"', 'italic 400 40px "Instrument Serif"']) await document.fonts.load(f);
   };
 

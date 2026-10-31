@@ -1,6 +1,6 @@
 # Second-pass ring review: the reviewer brief
 
-Stage 6 hands this brief, filled in, to a fresh agent on a mid-tier model. Never give it to the agent that measured the rects. Run `stills.py` from the final mp4 first, so the stills and the manifest exist. Fill `<project>` and `<N>` (the walk or chapter count), then send everything below the line as the prompt.
+Stage 6 hands this brief, filled in, to a fresh agent (model: SKILL.md stage 6). Never give it to the agent that measured the rects. Run `stills.py` from the final mp4 first, so the stills and the manifest exist. Fill `<project>` and `<N>` (the walk or chapter count), then send everything below the line as the prompt.
 
 ---
 

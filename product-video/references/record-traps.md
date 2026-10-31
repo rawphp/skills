@@ -9,6 +9,7 @@ Read before the dry-run. Symptom → cause → default action. No product names.
 | Tape is a few seconds; walk was minutes | `recordVideo` is **per page**. `context.newPage()` (portal, extra tab) writes a second file. Saving `readdir()[0]` keeps the wrong one | One page. `page.goto` for the other host. Save `await page.video().path()` after close |
 | Black or still first frame only | Context closed before the page flushed, or headless crashed | Close context, then read `video.path()`. Probe duration before calling it done |
 | Recording a new story overwrites an existing `walkthrough.webm` | The skill default path is shared | If that file already holds another surface's tape, write this one under a named subdirectory. Do not clobber |
+| The harness's `-sheet.png` fails ("Cannot write more than one file") | `tile=4x6` holds 24 frames at one per 6 s; a tape over 144 s makes a second image | The mp4 is fine. Build the sheet with `sheetw.py` |
 
 ## Navigation
 
@@ -18,6 +19,8 @@ Read before the dry-run. Symptom → cause → default action. No product names.
 | Click times out; locator "resolved" | A drawer or modal overlay intercepts. Hidden duplicate of the same label sits in the DOM | `Escape` first. Click the control **in the open surface**. Prefer `getByRole` on a visible button, not `getByText().first()` |
 | `getByText('…saved')` / `getByText('…updated')` fails strict mode on the record pass after a dry-run passed | Toast body and the activity title share the same words. `slowMo` keeps both on screen | Wait on `role=status` or the toast string **including its trailing period**. Do not use a substring that is also a feed heading |
 | Option text click fails on a dropdown | Native `<select>`, not a custom listbox | `locator('select[aria-label="…"]').selectOption({ label })` |
+| A walk waits on an assistant reply that is already on screen | It waited for the panel text to grow; a new chat's greeting disappears when the first message sends, so the text can shrink | Wait until the count of matches of the expected pattern rises |
+| A walk hangs on an organisation switch | The login has only one organisation | Read the organisation from the breadcrumb first; switch only when it differs |
 
 ## State and numbering
 
@@ -25,6 +28,7 @@ Read before the dry-run. Symptom → cause → default action. No product names.
 |---------|-------|----------------|
 | Unique constraint on a document number (`DOC-0013`) after a full seed | Minter uses **latest `created_at`**, not max numeric id. Fresh seed rows are newest and still on low numbers | After seed, set the newest live row's number past the historical max so the next UI create is free |
 | Second take fails on a one-shot action | First take spent a one-shot status (converted, approved) | Reset script: hero → start status; delete every record the walk created |
+| Tapes from one run show two different "today"s | A long chained run crossed midnight in the app's timezone | Check the clock first; wait, or restore and re-record every walk in one day |
 | Action controls (complete, pay, send) missing or disabled | An upstream row was never created (a parent saved as draft because an optional field was skipped) | Dry-run must assert the next row exists. Fill the required field that creates it even if the form allows skip |
 
 ## Playwright install

@@ -72,13 +72,13 @@ One folder of inputs, read in the mode the preset's `footage` names.
    When a walk's cursor parks on a claimed word, add a `glide` to empty space after the scroll and re-record only that walk, then delete its `cache/<walk>*` folders so `cut.py` decodes the new tape. When the recorder or its stack is gone, pick a stretch where the cursor is off the claimed words, or take the same surface from another walk and name it in `VALIDATE.md`.
 5. One row per clip in `PLAN.md`: file, length, what it shows, what it must not claim.
 
-The walk tool burns a caption chip into the bottom of each frame. `cuts.json` names it (`"chip": {"y": 847, "h": 36}`) and the recordings folder (`"source": "<dir>"`); `cut.py` crops every frame above the chip. The chip is not evidence: a fact that existed only in the chip is not spoken or ringed. If the walk says a control is sample data, the scene says so and cuts to the live surface.
+The walk tool burns a caption chip into the bottom of each frame. `cuts.json` names it (`"chip": {"y": 847, "h": 36}`) and the recordings folder (`"source": "<dir>"`); `cut.py` crops every frame above the chip. In walks, centre every card or row the narration will claim (`el.scrollIntoView({block: "center"})`): `scrollIntoViewIfNeeded` stops with the target at the bottom edge, under the chip. Before writing the script, read each walk's sheet for claimed results below source y ~818 (counts in a sticky dialog footer are the usual case) and rewrite those lines. The chip is not evidence: a fact that existed only in the chip is not spoken or ringed. If the walk says a control is sample data, the scene says so and cuts to the live surface.
 
 **Live.** The app recorded by `rec.mjs`. Dry-walk the audience's screens as the persona (headless screenshots, or `node "$SK/rec.mjs" --dry <id>` once scenes exist) and note the real states, messages and demo names. The story comes from these. Read `references/traps.md` before the first recording and `references/playwright-record.md` for the one-page rule.
 
 **Cards.** No footage. Read the source the preset names (a spec page, a PR and its review, an article) and copy the exact lines each card will show.
 
-**Dispatch point.** With more than three clips, send one agent per clip. Each gets the clip's contact sheet (`$PY "$SK/sheetw.py" <stem> 0 <end> 1 sheet.jpg` after `cut.py` decodes it), the narration line for its scene and this stage's rules, and returns its source row and a `cuts.json` fragment with proposed segments. The line merges the fragments and owns the result.
+**Dispatch point.** With more than three clips, send one agent per clip. Each gets the clip's contact sheet (`$PY "$SK/sheetw.py" <stem> 0 <end> 1 sheet.jpg` after `cut.py` decodes it), the narration line for its scene and this stage's rules, and returns its source row and a `cuts.d/<scene>.json` fragment with proposed segments, plus a merge script, so it can run `cut.py <scene>` and `render.mjs --at` on its own scenes and measure at `cut.py`'s printed "src at ring+0.3", not a guessed source time. The line merges the fragments and owns the result.
 
 ## Stage 3. Script
 
@@ -102,10 +102,10 @@ $PY "$SK/sfx.py"          # default effects + video.json extras; skips existing 
 
 **Tape: `cuts.json`.** One segment per spoken control, not one per walk. For each segment: `src [in, out]` on a stretch where that control stays still, the cue (`at`, `n`, `off`), the `ring [x, y, w, h]` in source px of the original frame (required), `ring_at`/`ring_n` when the ring cue differs from the cut, `zoom` (about 1.6–2.0; a target that will not fit gets a wider shot), `crop` (`top`, `low` or `zero`), `kind` for the measurer (`box`, `row`, `dialog`, `ink`), and an optional `sticker`.
 
-- Measure on the decoded frame at the ring's own source time, which `cut.py` prints per segment. Tools: `bounds.py` (content bounds in a region), `grid.py` (a labelled source-px grid), `quad.py` (four times side by side), `still.py` (where the page stops moving).
+- Measure on the decoded frame at the ring's own source time, which `cut.py` prints per segment. Tools: `bounds.py` (content bounds in a region), `grid.py` (a labelled source-px grid), `quad.py` (four times side by side), `still.py` (where the page stops moving). Convert `grid.py` readings by the label spacing (two labels give px per source unit), never by eye against the nearest label.
 - The target is the whole control: a row with its trailing menu, the whole card, a field with its adornment and helper text. Never an inner span, never a wrapper that also holds a sibling.
 - Ring = the control's edges plus 6 source px, clamped to its card or dialog.
-- `$PY "$SK/snap.py" --write` re-measures every ring from pixel profiles and settles the edges. A `MOVING` flag means the page was still moving: pick a later still stretch.
+- `$PY "$SK/snap.py"` re-measures every ring from pixel profiles and settles the edges. A `MOVING` flag means the page was still moving: pick a later still stretch. Never `--write` blindly: its `dialog` and `row` suggestions can widen a text ring to the whole dialog, or take a row from card border to card border. Take only `box` suggestions whose spread is 0 and check each in a still. Ring a table row from its content (first text −6 to last control +6), at least 4 px off the row's own dividers.
 
 **Live: `scenes.mjs`.** One entry per footage line, each beat cued to a word with `r.at` (`references/api.md`; a starter is in `templates/`). Dry-run until clean: `node "$SK/rec.mjs" --dry s03 s04`.
 
@@ -121,7 +121,7 @@ From the project folder, in order:
 4. `node "$SK/render.mjs" --at <ring t + 0.3 for every ring>`, then look. With more than about a dozen stills, tile them 2×3 (960×540 tiles on a 1920×1620 canvas) and read the sheets. Fix and repeat. Never full-render to find what a still would show.
 5. Create the output folder, then `node "$SK/render.mjs"` and `$PY "$SK/mix.py"` (voice at −16 LUFS, ducked music, effects; muxes to `video.json` `output`).
 6. `$PY "$SK/qa.py"`: flashes, hard cuts, loudness, `qa/sheet.jpg`.
-7. `$PY "$SK/deliver.py"`: `<name>.srt`, `contact-sheet.jpg` and `script.md` beside the mp4.
+7. `$PY "$SK/deliver.py"`: `<name>.srt`, `contact-sheet.jpg` and `script.md` beside the mp4. Several videos delivering into one folder overwrite each other's sheet and script: give each video its own output folder.
 
 The engine renders 16:9 only. For a 9:16 social cut, do not re-render: in ffmpeg, scale the final video to 1080 wide, centre it on a solid brand-colour 1080×1920 `color` source, and overlay a Pillow-made headline PNG above it and the link below. A blurred copy of the video as the background turns pale on light scenes and the text disappears.
 
@@ -130,7 +130,7 @@ The engine renders 16:9 only. For a 9:16 social cut, do not re-render: in ffmpeg
 `gate.py` and `qa.py` are necessary and not enough: neither reads the words.
 
 1. `$PY "$SK/stills.py"`: ring stills (ring + 0.3 s) and after stills (ring end + 0.15 s) cut from the final mp4, tiled into `review/ring-N.jpg` and `review/after-N.jpg`, with `review/manifest.json`.
-2. **Dispatch point.** The second pass is a fresh agent on a mid-tier model, given `references/review-pass.md` filled in with the project path. Never the agent that measured. It returns one row per ring.
+2. **Dispatch point.** The second pass is a fresh agent on an Opus-class model (a mid-tier pass missed 2–5 px padding and stickers that outlive their cut); budget about four rounds for ~40 rings. It gets `references/review-pass.md` filled in with the project path. Never the agent that measured. It returns one row per ring.
 3. A failed ring goes back to stage 4, then `stills.py --only <keys>` and the same reviewer on only those rings. A ring that cannot improve (no more margin exists in the source) is accepted by name in `VALIDATE.md`, not hidden.
 4. Check the whole-video items: every card the preset's shape lists is present and the counts match; footage scene lengths are inside the preset's range; total length is inside the target or the gap is named; loudness about −16 LUFS; no single-frame flashes.
 
