@@ -1,14 +1,14 @@
 ---
 name: babysit-prs
 description: 'Work through a set of open pull requests until each is merged: CI green and review-gate 5/5 on the same pushed head, then squash-merge. Use for /babysit-prs, "babysit my PRs", "get all my PRs green and merged", "merge everything that passes the gate", or a /loop over open PRs. Needs gh and a repo gated by review-gate-v2. Differentiator: orchestrates many PRs with one worker each and owns the merge; review-loop fixes one PR and never merges, review-gate only reviews.'
-argument-hint: '[PR numbers | "mine" | "all"] [--batch 3] [--every 15] [--unattended]'
+argument-hint: '[PR numbers | "mine" | "all"] [--batch 3] [--every 15] [--attended]'
 ---
 
 # Babysit PRs
 
 You are the lead. You do not fix code. You pick PRs, start one worker per PR, answer the workers' questions, and merge a PR once its pushed head has green CI and a 5/5 review round. Workers do the fixing with `review-loop`.
 
-**REQUIRED SUB-SKILLS:** `review-loop` (what each worker runs) and `review-gate` (round mechanics, settling). `council` when the person said to run unattended. Read `references/field-lessons.md` before starting.
+**REQUIRED SUB-SKILLS:** `review-loop` (what each worker runs) and `review-gate` (round mechanics, settling). `council` for decisions: the run is unattended by default, and only `--attended` (or the person saying to ask them) sends real choices to the person. Read `references/field-lessons.md` before starting.
 
 ## The merge rule
 
@@ -38,6 +38,7 @@ uptime                                                                          
 Work a batch of 3 (or `--batch`). Each tick:
 
 ```bash
+gh pr list --author @me --state open --json number,isDraft,headRefName,updatedAt   # re-list: PRs open after the run started join the queue
 scripts/tick.sh <PR> <PR> <PR>     # state, check counts, failed checks, local review state, worker reports
 ```
 
@@ -47,7 +48,7 @@ scripts/tick.sh <PR> <PR> <PR>     # state, check counts, failed checks, local r
 4. **Refill** the batch with the next oldest PR: survey it (diff size, failing checks, draft or not, existing worktree or review state), then start a worker with `references/worker-brief.md`.
 5. **Report** to the person: what merged, what you decided and why, what is waiting, anything they must know. Then schedule the next tick in `--every` minutes. The person can also set it in words ("check every 20 minutes"), at the start or mid-run. With no interval given, use 15 minutes, or 10 when a PR is one check from done. An interval the person set is used as given.
 
-Stop when the queue is empty, when nothing can progress without the person, or when told to.
+**The loop never ends on its own. Stop only when the person tells you to.** Always schedule the next tick. An empty queue is not the end: skip `tick.sh` (it needs at least one PR), report one line ("queue empty, watching"), and tick again at the usual interval so a PR opened later is picked up. When nothing can progress without the person, say what is waiting and keep ticking.
 
 ## Workers
 
@@ -82,7 +83,7 @@ A worker brings you a finding it must not decide alone. Route it:
 | A plain defect with one fix | Tell the worker to fix it. It should not have asked. |
 | Answered by the issue's own words, a repo rule, or an existing header, doc or pattern | Answer from that text and quote it. No council. |
 | Same mechanism, sites and asked-for fix as one already settled on this PR | Settle with the same reason. Give the worker a standing rule for further re-raises. |
-| A real choice between options (scope, behaviour, security trade-off, data migration, a new dependency) | Attended: ask the person, with options and a recommendation. Unattended: run `council`, then act. |
+| A real choice between options (scope, behaviour, security trade-off, data migration, a new dependency) | Run `council`, then act. With `--attended`: ask the person, with options and a recommendation. |
 | The same rule attacked from a third angle | Stop patching. Take the structural answer, or settle. |
 
 Rules that held up:

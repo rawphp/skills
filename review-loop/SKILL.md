@@ -75,7 +75,7 @@ Only three things end the loop short of 5/5:
 
 - **Two `incomplete` rounds in a row.** The reviewers are failing, not the code: report the failed reviewers. One `incomplete` round reruns as it is on the same head: the one exception to "committed nothing? run no round", because an incomplete round is not saved and so cannot mark anything fixed. Read its verdict first: the reviewers that finished still list findings, and when they are specific, fix and commit before the rerun.
 - **The PR merged or closed** (`references/fixing.md`, "The PR merged or closed").
-- **The person's call with no person in the session** (a factory or headless run): hand over what is left.
+- **The person's call with no person in the session** (a factory or headless run): run the `council` skill on each such finding and follow its "Unattended runs" rules. Apply what it decides and keep going. Hand over only what it leaves to the person: every settle, and any finding it could not agree on.
 
 Four cases read the pair differently. Each one keeps the loop going:
 
