@@ -27,7 +27,8 @@ here and open a PR, unless triage says otherwise.
 - Commits and PRs carry the change only: strip `Co-Authored-By` trailers (factory commits have them) and any tool byline.
 
 ## Steps
-0. **Salvage.** The factory usually pushed its work, named by slug, not issue number.
+0. **Salvage.** The factory usually pushed its work, named by slug, not issue number. Read the stuck comment first: it may
+   name the branch, and other factories use other prefixes (`superset/fac-*`, `fac/<N>-*`); sweep those the same way.
    `git -C {{PRIMARY}} fetch origin '+refs/heads/t3/*:refs/remotes/origin/t3/*'`, then
    `git -C {{PRIMARY}} for-each-ref --format='%(refname:short) %(committerdate:short) %(subject)' refs/remotes/origin/t3/`.
    Match on slug or commit subject (`git log origin/t3/<x> --grep '#<N>'`). The issue's factory comments may name the

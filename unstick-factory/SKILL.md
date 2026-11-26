@@ -22,7 +22,7 @@ For each issue, pull the factory's reason and the run's last event:
 gh api repos/O/R/issues/N/comments --paginate -q '[.[]|select(.body|test("Reason:"))]|last|.body' | grep -m1 '^Reason:'
 ```
 
-The run record (`finished`: `outcome`, `reason`, `gate_attempts`, `pr_url`) lives on the machine that ran it. `factory-issue` step 1 says which machine and path. Group the issues by reason:
+Read the stuck comment first: it often names the branch outright, and the prefix depends on the factory (`t3/*`, `superset/fac-<N>-<attempt>-<id>`, `fac/<N>-<attempt>`). The run record (`finished`: `outcome`, `reason`, `gate_attempts`, `pr_url`) lives on the machine that ran it. `factory-issue` step 1 says which machine and path. Group the issues by reason:
 
 | Reason | What it usually means |
 |---|---|
@@ -48,9 +48,11 @@ Put issues that edit the same file, or where one blocks the other, on **one** wo
 
 Each worker runs: salvage → triage → build → PR → relabel → clean up (details in the brief). Workers never watch CI and never push again once a PR is open.
 
+Before starting a worker on an issue that has a branch or PR, check nobody holds it: `git worktree list | grep <branch>`, live processes in that worktree (`lsof +D <worktree>`), and unpushed commits there. A babysit-prs worker (`rl-pr<PR>` worktree) may be mid review loop even when the person says nobody is on it. To name the owning session, take a shell PID in the worktree, then its parent Claude PID, then that process's cwd (`lsof -a -p <pid> -d cwd`), and match it to a `ListAgents` row.
+
 ## 4. Hand off
 
-As each PR opens, message the babysit-prs session (find it with `ListAgents`; if none is running, tell the person to start `/babysit-prs`). Say, in one message per PR:
+As each PR opens, message the babysit-prs session. `ListAgents` shows peer sessions only by random worktree names, so at the start of the run ask the person which session it is, or to start `/babysit-prs`. Say, in one message per PR:
 
 - PR number, issue number, base branch, stacked or not
 - shared files with other open PRs, and merge-order traps (a ceiling test, a schema regen, a migration date)
