@@ -18,7 +18,7 @@ A watched repo can still lack them. Check before filing, or every create fails o
 gh label list -R OWNER/REPO --limit 200 --json name --jq '.[].name' | grep -E '^(factory|type):'
 ```
 
-Create missing `factory:*` labels with the colours in the factory's add-a-repo guide (`factory/site/guide/add-a-repo.md` in t3code-factory), for example `gh label create factory:proposed -R OWNER/REPO --color c5def5`. Create missing `type:*` labels with these colours, one command each:
+Create all seven missing `factory:*` labels before anything goes `ready` (a missing `factory:triage` makes every claim fail), copying names, colours and descriptions from a watched repo: `gh label list -R <watched> --json name,color,description`. Create missing `type:*` labels with these colours, one command each:
 
 | Label | Colour |
 |---|---|
@@ -42,9 +42,11 @@ gh issue create -R OWNER/REPO --title "<type>: <outcome in one line>" --body-fil
 GitHub dependency relationships are what the factory reads first. The REST call takes the blocker's **node id**, not its number, and needs `-F`: `-f` sends the id as a string and the call returns 422.
 
 ```sh
-BLOCKER_ID=$(gh api repos/OWNER/REPO/issues/<blocker> --jq .id)
-gh api -X POST repos/OWNER/REPO/issues/<dependant>/dependencies/blocked_by -F issue_id=$BLOCKER_ID
+gh api repos/OWNER/REPO/issues/<blocker> --jq .id
+gh api -X POST repos/OWNER/REPO/issues/<dependant>/dependencies/blocked_by -F issue_id=<that id>
 ```
+
+Two calls with the literal id: the harness refuses `$(...)` in the POST. Don't drop a blocker on an assumed 50-per-issue cap; try the POST and read `blockedBy.totalCount` back.
 
 The POST echoes the dependant's number, not the blocker's, so its output does not confirm the link; Verify does. A blocker in another repo works the same way with that repo's path in the first line.
 
