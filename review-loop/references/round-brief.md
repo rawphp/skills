@@ -14,27 +14,23 @@ You are running one review round of the review-gate-v2 CLI on a branch and repor
 - review-gate-v2 checkout: <$REVIEW_GATE_V2_HOME or checkout path> (use as PYTHONPATH on every python call).
 - GitHub token: put `GITHUB_TOKEN="$(gh auth token<-u account, when setup needed one>)"` on the same command as every python call. The CLI reads GITHUB_TOKEN, not GH_TOKEN.
 - Base ref: <remote>/<pr base branch> (the PR's base; already fetched).
-- PR: <N> in <owner/name>. Title in /tmp/rg-<repo>-<N>/title.txt, body in /tmp/rg-<repo>-<N>/body.txt.
-- Previous round state: /tmp/rg-<repo>-<N>/state.json (pass `--state-file`). <or: none; omit the flag> <or: pass `--full`; the base was merged since the last saved round>
-- Output dir: /tmp/rg-<repo>-<N>/round<R>.
-- Do NOT pass `--maker-model`.
+- PR: <N> in <owner/name>. The round script reads title and body from `gh pr view` itself.
+- Previous round state: <scratch>/state.json (pass `--state-file`). <or: none; omit the flag> <or: pass `--full`; the base was merged since the last saved round>
+- Scratch dir: <scratch>. Output dir: <scratch>/round<R>.
+- Do NOT add `--maker-model`; the lead puts it in the round script only when the PR's maker is not opus.
 
 ## Run the round
 
-Shell state does not persist between tool calls, so every command is self-contained. Make the scratch dir in its own call and note the printed path as <run>:
+Shell state does not persist between tool calls, so every command is self-contained.
 
-cd <worktree path> && run="$(mktemp -d)"; echo "$run"
+Launch the round script the lead wrote, in its own Bash call. It survives the tool's 600000 ms cap; `run_in_background` does not, and a round takes 10 to 25 minutes:
 
-Launch the CLI as its own Bash call with `run_in_background: true` and a 600000 ms timeout. Run it in that call's foreground, redirects and exit capture inline. Never `( … ) &`: a backgrounded subshell holds the tool call open to its timeout and nothing tracks the CLI.
+rm -f <scratch>/round<R>.exit; cd <worktree path> && nohup bash <scratch>/round.sh <R> [--state-file <scratch>/state.json | --full] >/dev/null 2>&1 </dev/null & disown
 
-cd <worktree path> && GITHUB_TOKEN="$(gh auth token<-u account>)" PYTHONPATH=<checkout> python3 -P -m review_gate review --format plain --base <remote>/<base> --pr <N> [--state-file /tmp/rg-<repo>-<N>/state.json | --full] --out /tmp/rg-<repo>-<N>/round<R> --title "$(cat /tmp/rg-<repo>-<N>/title.txt)" --body "$(cat /tmp/rg-<repo>-<N>/body.txt)" > <run>/out 2> <run>/err; echo $? > <run>/exit
+Within 30 s, check `pgrep -f "review_gate review.*<scratch dir name>"` prints a pid; none and no exit file means the launch failed: report it and stop. Then poll `<scratch>/round<R>.exit` in bounded waits of about 2 minutes. Do not end your turn until it holds a number. If it holds one within the first minute, setup failed: report the last 20 lines of `<scratch>/round<R>.err` and stop.
 
-If a guard refuses that call (an isolated session that cannot show the command is not git), write it to a script under the session's tmp dir (the cd, the command with "$@" for the extra flags, the exit capture) and run `bash <script>` the same way, background and timeout as above; do not retry the inline form.
-
-The harness tells you when it exits; a round takes 10 to 25 minutes. Do not end your turn until <run>/exit holds a number. If it holds one within the first minute, setup failed: report all of <run>/err and stop.
-
-Exit 0 or 1: cat /tmp/rg-<repo>-<N>/round<R>/verdict.json in full. Read nothing else (not events.jsonl, report.md, summary.md or <run>/out).
-Exit 2 or 4: no verdict. Report the last 20 lines of <run>/err.
+Exit 0 or 1: cat <scratch>/round<R>/verdict.json in full. Read nothing else (not events.jsonl, report.md or summary.md).
+Exit 2 or 4: no verdict. Report the last 20 lines of `<scratch>/round<R>.err`.
 
 ## Report back (exact shape, under about 4000 characters)
 
