@@ -52,6 +52,8 @@ Before starting a worker on an issue that has a branch or PR, check nobody holds
 
 ## 4. Hand off
 
+Before handing a PR over, run `gh pr diff N --name-only` and check that it lists only the issue's files. A salvage built from an old branch's tree reverts everything base gained since (one undid a merged 32-file PR). A file outside the issue goes back to the worker.
+
 As each PR opens, message the babysit-prs session. `ListAgents` shows peer sessions only by random worktree names, so at the start of the run ask the person which session it is, or to start `/babysit-prs`. Say, in one message per PR:
 
 - PR number, issue number, base branch, stacked or not

@@ -40,6 +40,10 @@ here and open a PR, unless triage says otherwise.
    - Run the static checks the factory never reached (PHPStan, typecheck). Its gate never ran, so a type error is the
      likeliest gap.
    - Prove the new tests fail without the fix (revert the fix file, run, restore).
+   - Never apply a two-dot diff of the old branch (`git diff origin/{{BASE}} origin/t3/<x>`) or check out its tree. That
+     diff reverts everything base gained since the branch was cut, and one salvage quietly undid a merged 32-file PR this
+     way. Squash with the three-dot diff (`origin/{{BASE}}...origin/t3/<x>`) or cherry-pick. Before pushing, check that
+     `git diff --stat origin/{{BASE}}...HEAD` lists only the issue's files.
 1. **Triage**, before any new code. `gh issue view <N> -R {{REPO}} --comments`.
    - A blocker under `## Depends on` or blockedBy still open: stop, report "blocked by #X".
    - Already done on base (grep for the symbols, tests or behaviour the criteria name; `gh pr list --state all --search`):
