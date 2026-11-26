@@ -9,6 +9,8 @@ Read before the dry-run. Symptom → cause → default action. No product names.
 | Tape is a few seconds; walk was minutes | `recordVideo` is **per page**. `context.newPage()` (portal, extra tab) writes a second file. Saving `readdir()[0]` keeps the wrong one | One page. `page.goto` for the other host. Save `await page.video().path()` after close |
 | Black or still first frame only | Context closed before the page flushed, or headless crashed | Close context, then read `video.path()`. Probe duration before calling it done |
 | Recording a new story overwrites an existing `walkthrough.webm` | The skill default path is shared | If that file already holds another surface's tape, write this one under a named subdirectory. Do not clobber |
+| Re-recording one walk fails on leftover rows and the good tape is gone | A failing walk overwrites that walk's mp4, and the earlier take already wrote to the database | Restore the seed before re-recording any single walk, or copy the tapes aside first |
+| `cut.py` decodes nothing from a phone walk (390×844) and the cache stays empty | The tape is its own frame size, not a phone inside 1440×900, so `crop=1440:810` misses | Compose each phone tape onto a 1440×900 brand-colour canvas first (`color=…:s=1440x900[bg];[0:v]crop=390:<chip top − ~10>:0:0[ph];[bg][ph]overlay=525:30:shortest=1`), point `cuts.json` `source` at a folder of symlinks plus the composed files, and map phone px to source px by the overlay offset. Zoom ~2.2 on phone rings |
 | The harness's `-sheet.png` fails ("Cannot write more than one file") | `tile=4x6` holds 24 frames at one per 6 s; a tape over 144 s makes a second image | The mp4 is fine. Build the sheet with `sheetw.py` |
 
 ## Navigation

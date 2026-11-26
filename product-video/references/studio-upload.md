@@ -15,7 +15,7 @@ Read only when the user asks you to do the upload, not just package it. Drive St
 - Title, description and the schedule date field are all `#textbox`. Fill one by selecting the node's contents and calling `Input.insertText`. `Cmd+A` key events do not select.
 - The category dropdown's visible list is not the `tp-yt-paper-item` set a selector finds. Click the trigger, click the option where a screenshot shows it, and read the value back.
 - To schedule, click the day cell in the date picker rather than typing a date, and type `HH:MM` into the time input. The time zone defaults to local.
-- A "We're still checking your content" notice can block Schedule until you click "Got it".
+- A "We're still checking your content" notice can block Schedule until you click "Got it". Saving as unlisted or public while checks run opens the same notice with Publish anyway / Go back: click Go back, poll until "Checks complete. No issues found.", then save.
 - The "Video published" dialog can show a stale title. Confirm titles, visibility and dates from the content list's rows (`ytcp-video-row`), not the dialog.
 
 ## After upload
