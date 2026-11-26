@@ -16,7 +16,7 @@ Merge a PR only when all four hold for the **same head sha**:
 
 1. That sha is the PR's current head on the remote.
 2. Every check on it is `pass` or `skipping`. A skipped coverage or test job behind a failed shard is not a pass: wait for the real run.
-3. A saved review-gate round on that sha is `done` at 5/5.
+3. A saved review-gate round on that sha is `done` at 5/5. A `## Review` section in the PR body (a factory build's in-house review) does not count: workers start at round 1 whatever the body says.
 4. No unresolved review thread (a gated repo refuses the merge otherwise).
 
 `scripts/merge.sh` checks 1 and 2 again at merge time. You check 3 from the worker's report and the local review state, and 4 with `gh`.
@@ -31,6 +31,7 @@ uptime                                                                          
 
 - Read the repo's and the person's instruction files for merge method, commit trailers, PR body sections, and machine limits. They override this skill.
 - Skip, and tell the person why, any PR whose diff is in the megabytes (`git diff origin/<base>...origin/<branch> | wc -c`): review-gate cannot review it.
+- If the review Action ends `incomplete` within a minute on every PR, it has hit its own usage limit. Read the failure once, note the reset time, and treat local rounds as the review of record until then.
 - Ask the person only what you cannot find: which PRs (default: theirs, oldest first), and whether a comment on a PR has side effects in this repo (a bot that relaunches a build). If comments have side effects, nobody posts any.
 
 ## The loop
@@ -58,10 +59,13 @@ One worker per PR, each in its own worktree outside the repo. Fill in `reference
 
 ```text
 <inbox>/pr<N>.md            worker overwrites with every status, question and final report
-<inbox>/answers/pr<N>.md    lead overwrites with every answer; worker polls its mtime
+<inbox>/answers/pr<N>.md    lead overwrites with every answer; worker polls its content hash
+<inbox>/briefs/             briefs and drafts (tick.sh prints every *.md at the inbox root)
 ```
 
-`<inbox>` is `$BABYSIT_INBOX`, default `/tmp/babysit-prs`. `scripts/tick.sh` prints every report.
+`<inbox>` is `$BABYSIT_INBOX`, default `/tmp/babysit-prs`. `scripts/tick.sh` prints every report. If the default inbox holds files you did not write, use `/tmp/babysit-prs-<repo>`. Workers poll answers by content hash (`md5 -q`), not mtime: the mtime can stay at the first write.
+
+**Worktrees.** Before reusing or removing a worktree you did not create, check for processes running in it (`lsof -a -d cwd` over `pgrep -f <path>`) and its creation time. If anything runs there or it is minutes old, it is another session's: give the worker its own worktree and merge without `--worktree`. Each worktree keeps its own build output directory; a shared one (such as one `CARGO_TARGET_DIR`) lets a local gate test another branch's code.
 
 Tell each worker what the last few taught you: the base's current red test, known flakes and how to clear them, guard tests the PR author's own gate skips. This is the cheapest speed-up in the loop.
 
@@ -73,6 +77,7 @@ Tell each worker what the last few taught you: the base's current red test, know
 | Report unchanged, PR head unchanged, worker shows as running | Read the tail of its transcript. If its last tool call is over ~30 minutes old, stop it and start a replacement on the same worktree. Brief the replacement to inspect what the old one left (unpushed commits, unstaged files, a half-run git command) before building on it. |
 | Worker is polling and you need it to change course | Stop it, then message it. It resumes with its context. |
 | Worker went idle with no report | Read its last outgoing message from the transcript before pinging. The question is usually there. |
+| Your session restarted and the workers died with it | Read each PR's saved verdict and report first. Where a round is `done` at 5/5 on the current head, watch CI and merge yourself. Start a replacement only for what a report would have held (a deploy paragraph, a migration analysis). |
 
 ## Decisions
 
@@ -91,7 +96,8 @@ Rules that held up:
 - **A defect already on the base and outside the issue is settled with a filed follow-up**, not folded into the PR. File the issue first, then put its number in the settle reason.
 - **Label a follow-up ready to build only when it holds no open question.** One that needs the person's call is filed as proposed, with the question stated.
 - **Settles are local** (`review_gate settle`) when comments have side effects. Say in the report that a later Action review will not know about them.
-- **Anything reserved for the person** (a dependency, a data-deleting migration, waiving a security finding): when a council decides it on delegation, say so plainly in the report so the person can reverse it.
+- **Anything reserved for the person** (a dependency, a data-deleting migration, waiving a security finding): when a council decides it on delegation, say so plainly in the report so the person can reverse it. A merge the person keeps for themselves (a migration that drops a column) still gets a worker to 5/5 and green. Say in the brief you will not merge it, and ask for a decision section in the final report: data loss, `down()`, a mid-deploy failure, partial DDL state, whether the table is populated.
+- **A finding settled as another issue's scope:** check which issue makes the gap reachable. If it does not depend on the issue that closes the gap, add that dependency (`## Depends on` in the body plus the tracker link) in the same tick, and name it in the settle reason.
 - Record each council in the report in the council's own format, and keep the transcript path.
 
 ## Merge
@@ -106,9 +112,23 @@ Before calling it:
 
 - Read the worker's final report, not just its one-line message.
 - Compare the report's head with the local review state's head and round status.
-- Check the PR body no longer carries a tool byline, and that lines the fixes made untrue were corrected.
+- Check the PR body no longer carries a tool byline, and that lines the fixes made untrue were corrected. Grep it for the headings the person's rules require (such as Testing, Risk, How to revert); add missing ones from the worker's final report, whose deploy paragraph gives the risk and revert text.
+- Once the worker's status line names a 5/5 `done` round on the pushed head, watch that CI run yourself (`gh run watch <id> --exit-status`) and merge the moment it is green. Do not wait for the final report while a factory session could still push.
+- If the worker holds an unpushed commit for something separate (a flaky test), merge the green head anyway. Tell the worker to put the commit on a new branch from the base as its own PR, and not to push to the merged branch.
 
-After it: delete the PR's inbox files, tell the person what merged and what was settled or left open, and tell any worker whose PR touches the same files that the base moved.
+After it: delete the PR's inbox files, tell the person what merged and what was settled or left open, and tell any worker whose PR touches the same files that the base moved. Compare the merge's files with each remaining green PR's (`comm -12` of the two `--name-only` diffs). On overlap in generated or shared files, send that worker back to merge the base, regenerate, and run a round on the new head before you merge it: there may be no textual conflict.
+
+## Factory-built PRs
+
+On a repo the factory builds into, the issue's `factory:*` label says who owns the branch. Read it, and the run ledger, before starting a worker and before every merge step.
+
+- **`factory:building`:** the factory is still building or gating. Do not start a worker; wait for `gate-passed` / `factory:pr-open`. Past two gate attempts on the same head, read the ledger's `gate_command` exit codes and the gate log, and name the failing test and the loop to the person straight away. A loop can run for hours without the issue going `stuck`.
+- **`factory:pr-open`:** the factory re-claims the issue on a red check and pushes its own fix, which voids the 5/5. Brief workers to push once per round and run no builds while a factory gate runs. Stand the worker down the moment the label leaves `pr-open`.
+- **The four conditions hold and only a factory re-gate is pending:** merge, or ask the person, right then. A loaded machine can time the gate out and send the PR back to draft. Merging closes the issue and ends the run.
+- **`factory:stuck` with a done draft PR green in CI:** start a worker on it like any other PR, name CI as the record in the body, and merge with `--ready`.
+- **Relabelled `factory:ready` while its PR is 5/5 and green:** merge at once (closing the issue stops the claim) and tell the person. Otherwise the factory rebuilds it from the base.
+- **Re-readied mid-loop:** have the worker commit its fix locally and run the round on that unpushed sha; a round counts once that same sha is pushed. Push only after the factory's session has ended (`pr_opened` in its run record).
+- **Factory commits outside the issue's files:** run the failing test on the base and on the factory's head before building on them. When the base is green, have the worker revert them with new commits, in the same push as its own fix.
 
 ## When the base goes red
 

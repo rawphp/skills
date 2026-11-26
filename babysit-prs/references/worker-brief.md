@@ -7,7 +7,8 @@ Get pull request #<N> (branch `<branch>`, base `<base>`, closes issue #<issue>, 
 
 TALKING TO ME (use files; messages are unreliable):
 - To tell me anything (5/5 + green CI, a stop rule, a decision you need, any status): overwrite <inbox>/pr<N>.md with the full message.
-- To get my answer: poll <inbox>/answers/pr<N>.md (watch for it to appear or its mtime to change) every ~2 minutes, and act on what it says. Keep working on everything that does not depend on the answer.
+- To get my answer: poll <inbox>/answers/pr<N>.md every ~2 minutes (watch for it to appear or its content hash, `md5 -q`, to change; the mtime can stay at the first write), and act on what it says.
+- The moment a round is `done` at 5/5 on the pushed head, write a status line naming head, round and score. Do not wait for CI first. Keep working on everything that does not depend on the answer.
 
 How: load the `review-loop` skill and follow it, with `review-gate` for round mechanics. Read their field-lessons files.
 
@@ -19,13 +20,15 @@ What I already know (<date, time>):
 - <known flakes and the command that clears them>
 - <what the PR author's own gate skips that CI runs: the guard tests and environment differences that bit earlier PRs>
 - <sibling PRs in the same files: which, and who merges first>
-- <decisions already made that this PR must respect>
+- <decisions already made that this PR must respect: quote the issue's words or point at them; never restate a rule more broadly than the issue does>
 - <the review rules that matter for this kind of change: money, auth, migrations, offline storage, infrastructure, AI features>
 - <whether the review Action will review this PR; whether `--state-file` is needed; existing worktree or local review state>
 - Main checkout: <path> (on <base>). Create your own worktree outside the repo at <path>. Absolute paths in every Bash call. Never `git stash`.
 
 Hard rules:
 - <model-call routing for this machine, e.g. the env prefix every review_gate call needs>
+- `--maker-model`: <leave it out when the PR's maker is opus or unknown; otherwise the PR's real maker, e.g. a factory body's `maker:` line>. Never one shared value for every PR: a maker naming opus puts the reviewers on sonnet and the rounds come back hollow. Report the reviewers' model and `num_turns` with each round.
+- Start every review-gate round detached (nohup/setsid, output to files): the harness caps background tasks at 10 minutes.
 - Post NO comments on the PR<: reason>. `git fetch` before every commit and push; if someone else pushed, merge their commits.
 - Do not settle findings yourself and do not file issues on your own. Plain defects with one obvious fix: just fix them. If a finding is wrong, pinned by the issue's acceptance criteria, already on the base, or a real choice between alternatives, report it once (the file) with: the finding, the issue text that pins it, lettered options, and your recommendation. Do not implement a default and do not run another round while it is open.
 - Keep the PR body true with `gh pr edit <N> --body-file` (only stale lines); remove any tool byline.
@@ -42,4 +45,5 @@ Final report (in the file), short: final head sha; last round's score, status, r
 - **Mobile or native:** CI only bundles. Ask for a "verify on a real device before go-live" list in the docs and the PR body.
 - **Money, approval, auth:** authorisation on every route with a cross-tenant test, state transitions and their races, lock order, idempotency, an audit entry per action, one rounding rule.
 - **A PR that touches a file a follow-up issue also names:** say which issue, and that its fix is not this PR's.
+- **Factory-built (issue at `factory:pr-open`):** push once per round, and run no builds while a factory gate is running. Revert any factory commit outside the issue's files in the same push as your fix.
 - **A takeover of a stalled worker's PR:** list the worktree, the unpushed commits, the unstaged files and the old worker's last command, and tell the replacement to verify all of it, and throw nothing away unread, before building on it.
